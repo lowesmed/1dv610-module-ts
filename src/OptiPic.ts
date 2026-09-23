@@ -13,7 +13,7 @@ export class OptiPic {
   /**
    * Path of image to optimize.
    */
-  #image
+  #imagePath
 
   /**
    * Initiziates OptiPic.
@@ -21,7 +21,7 @@ export class OptiPic {
    * @param path Path to image
    */
   constructor (path: string) {
-    this.#image = path
-    console.log(this.#image)
+    this.#imagePath = path
+    console.log(this.#imagePath)
   }
 }
