@@ -7,21 +7,28 @@
 
 
 /**
- * Represents the OptiPic
+ * Represents a OptiPic instance.
  */
 export class OptiPic {
   /**
    * Path of image to optimize.
    */
-  #imagePath
+  private imagePath : string | undefined
 
   /**
    * Initiziates OptiPic.
+   */
+  constructor () {
+    console.log('OptiPic instance created!')
+  }
+
+  /**
+   * Store image path.
    *
    * @param path Path to image
    */
-  constructor (path: string) {
-    this.#imagePath = path
-    console.log(this.#imagePath)
+  public load(path: string) {
+    console.log('Loaded' + path)
+    this.imagePath = path
   }
 }
