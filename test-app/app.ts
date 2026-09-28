@@ -1,4 +1,4 @@
-import { OptiPic } from "../src/OptiPic"
+import { OptiPic } from "../src"
 
 /**
  * Execution entry point.
