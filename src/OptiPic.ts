@@ -9,15 +9,30 @@ import { readFile } from 'node:fs/promises'
 import sharp from 'sharp'
 import { validateImageFormat, isUrl } from './SourceValidator.js'
 
+type ImageMetadata = {
+  format: string
+  width: number
+  height: number
+  size: number
+}
+
 /**
  * Represents a OptiPic instance.
  */
 export class OptiPic {
   /**
-   * Data from loaded image
+   * Data from loaded image.
    */
   private imageData : Buffer | undefined
 
+  /**
+   * Metadata from image.
+   *
+   * @private
+   * @type {(ImageMetadata | undefined)}
+   * @memberof OptiPic
+   */
+  private imageMetadata : ImageMetadata | undefined
   /**
    * Initiziates OptiPic.
    */
@@ -30,29 +45,42 @@ export class OptiPic {
    *
    * @param source Path to image
    */
-  public async load(source: string) {
+  public async load(source: string): Promise<void> {
     validateImageFormat(source)
 
-    if (isUrl(source)) {
-      console.log('Its a URL')
-    }
-    this.imageData = await this.loadFromFile(source)
-    console.log(this.imageData)
+    const data = (isUrl(source)) ? await this.loadFromUrl(source) : await this.loadFromFile(source)
+
+    const metadata = await this.readMetadata(data)
+
+    this.imageData = data
+    this.imageMetadata = metadata
+
   }
 
   private async loadFromFile(path: string): Promise<Buffer> {
     const data = await readFile(path)
-    console.log(data)
+
     return data
   }
 
-  public async getWidth() {
+  private async loadFromUrl(source: string): Promise<Buffer> {
+    console.log("Its a url!" + source)
+  }
 
-    const image = new sharp(this.imageData).metadata()
-    const metadata = await image
-    console.log(metadata.width)
-  //   image.on('info', ({ height }) => {
-  //   console.log(`Image height is ${height}`);
-  // })
+  /**
+   * Read metadata from loaded image using Sharp.
+   *
+   * @param data Buffer data from image.
+   * @returns Image metadata object
+   */
+  private async readMetadata(data: Buffer): Promise<ImageMetadata> {
+    const metadata = await sharp(data).metadata()
+
+    return {
+      format: metadata.format,
+      width: metadata.width,
+      height: metadata.height,
+      size: metadata.size ?? 0
+    }
   }
 }
