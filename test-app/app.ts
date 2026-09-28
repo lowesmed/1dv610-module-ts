@@ -1,6 +1,4 @@
-#!/usr/bin/env node
-
-import { OptiPic } from "./OptiPic.js"
+import { OptiPic } from "../src/OptiPic"
 
 /**
  * Execution entry point.
