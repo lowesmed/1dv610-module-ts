@@ -7,7 +7,7 @@
 
 import { readFile } from 'node:fs/promises'
 import sharp from 'sharp'
-import { validateImageFormat } from './SourceValidator.js'
+import { validateImageFormat, isUrl } from './SourceValidator.js'
 
 /**
  * Represents a OptiPic instance.
@@ -33,21 +33,11 @@ export class OptiPic {
   public async load(source: string) {
     validateImageFormat(source)
 
-    if (this.isUrl(source)) {
+    if (isUrl(source)) {
       console.log('Its a URL')
     }
     this.imageData = await this.loadFromFile(source)
     console.log(this.imageData)
-  }
-
-  /**
-   * Checks if source is a url.
-   *
-   * @param source Source string
-   * @returns {boolean} True if url, false if not
-   */
-  private isUrl(source: string): boolean {
-    return source.includes('http')
   }
 
   private async loadFromFile(path: string): Promise<Buffer> {
