@@ -48,5 +48,8 @@
     "tsx": "^4.23.13",
     "typescript": "^6.0.3",
     "vitest": "^5.0.0"
+  },
+  "dependencies": {
+    "sharp": "^0.35.5"
   }
 }
