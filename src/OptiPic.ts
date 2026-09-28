@@ -33,6 +33,12 @@ export class OptiPic {
     console.log(this.isUrl(source))
   }
 
+  /**
+   * Checks if source is a url.
+   *
+   * @param source Source string
+   * @returns {boolean} True if url, false if not
+   */
   private isUrl(source: string): boolean {
     return source.includes('http')
   }
