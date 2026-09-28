@@ -57,14 +57,25 @@ export class OptiPic {
 
   }
 
+  /**
+   * Collect Image data using file path.
+   *
+   * @param path - Path to image to load
+   * @returns Image buffer data
+   */
   private async loadFromFile(path: string): Promise<Buffer> {
     const data = await readFile(path)
 
     return data
   }
 
-  private async loadFromUrl(source: string): Promise<Buffer> {
-    console.log("Its a url!" + source)
+  /**
+   * Collect Image data using a URL source.
+   *
+   * @param url - URL to image
+   */
+  private async loadFromUrl(url: string): Promise<Buffer> {
+    console.log("Its a url! " + url)
   }
 
   /**
