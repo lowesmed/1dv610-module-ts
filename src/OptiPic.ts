@@ -6,6 +6,8 @@
  */
 
 import { readFile } from 'node:fs/promises'
+import sharp from 'sharp'
+import { validateImageFormat } from './SourceValidator.js'
 
 /**
  * Represents a OptiPic instance.
@@ -24,15 +26,18 @@ export class OptiPic {
   }
 
   /**
-   * Load image from url or file
+   * Load a valid image from url or file
    *
    * @param source Path to image
    */
-  public load(source: string) {
+  public async load(source: string) {
+    validateImageFormat(source)
+
     if (this.isUrl(source)) {
       console.log('Its a URL')
     }
-    this.loadFromFile(source)
+    this.imageData = await this.loadFromFile(source)
+    console.log(this.imageData)
   }
 
   /**
@@ -49,5 +54,15 @@ export class OptiPic {
     const data = await readFile(path)
     console.log(data)
     return data
+  }
+
+  public async getWidth() {
+
+    const image = new sharp(this.imageData).metadata()
+    const metadata = await image
+    console.log(metadata.width)
+  //   image.on('info', ({ height }) => {
+  //   console.log(`Image height is ${height}`);
+  // })
   }
 }
