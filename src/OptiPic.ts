@@ -23,14 +23,14 @@ export class OptiPic {
   }
 
   /**
-   * Store image path.
+   * Stores image source.
    *
-   * @param path Path to image
+   * @param source Path to image
    */
-  public load(path: string) {
-    console.log('Loaded' + path)
-    this.imagePath = path
-    console.log(this.isUrl(path))
+  public load(source: string) {
+    console.log('Loaded' + source)
+    this.imagePath = source
+    console.log(this.isUrl(source))
   }
 
   private isUrl(source: string): boolean {
