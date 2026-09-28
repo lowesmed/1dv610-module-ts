@@ -1,5 +1,5 @@
 // import { describe, it, expect } from 'vitest'
-// import { generateGreeting} from './app.js'
+// import { OptiPic} from './index.js'
 
 // describe('parseArgs()', () => {
 //   it('should return the first positional argument', () => {
@@ -11,7 +11,7 @@
 //   })
 // })
 
-// describe('generateGreeting()', () => {
+// describe('OptiPic.load', () => {
 //   it('should return a personalized greeting when a valid name is provided', () => {
 //     const result = generateGreeting('Ada Lovelace')
 //     expect(result).toBe('Hello, Ada Lovelace!')
