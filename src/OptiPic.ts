@@ -30,5 +30,10 @@ export class OptiPic {
   public load(path: string) {
     console.log('Loaded' + path)
     this.imagePath = path
+    console.log(this.isUrl(path))
+  }
+
+  private isUrl(source: string): boolean {
+    return source.includes('http')
   }
 }
