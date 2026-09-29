@@ -6,8 +6,10 @@
  */
 
 import { readFile } from 'node:fs/promises'
+import { writeFile } from 'node:fs/promises'
 import sharp from 'sharp'
 import { validateImageFormat, isUrl } from './SourceValidator.js'
+import { imageCompressor } from "./ImageCompressor.js"
 
 type ImageMetadata = {
   format: string
@@ -21,18 +23,15 @@ type ImageMetadata = {
  */
 export class OptiPic {
   /**
-   * Data from loaded image.
+   * Data of loaded image.
    */
   private imageData: Buffer | undefined
 
   /**
-   * Metadata from image.
-   *
-   * @private
-   * @type {(ImageMetadata | undefined)}
-   * @memberof OptiPic
+   * Metadata of image.
    */
   private imageMetadata: ImageMetadata | undefined
+
   /**
    * Initiziates OptiPic.
    */
@@ -54,7 +53,6 @@ export class OptiPic {
 
     this.imageData = data
     this.imageMetadata = metadata
-    console.log(this.imageMetadata)
   }
 
   /**
@@ -104,10 +102,35 @@ export class OptiPic {
     }
   }
 
+  /**
+   * Metadata for the currently loaded image.
+   *
+   * @returns A copy of the loaded image's metadata.
+   */
   public getMetadata(): ImageMetadata {
     if (this.imageMetadata === undefined) {
       throw new Error('No image has been loaded')
     }
     return {...this.imageMetadata}
+  }
+
+  /**
+   * ADD.
+   */
+  public async compress() {
+    console.log('Compressor here!')
+    const image = this.imageData
+
+    if(image === undefined) {
+      throw new Error('No image has been loaded')
+    }
+    const compressed = await imageCompressor(image, 200)
+    await writeFile('compressed.jpg', compressed)
+    const metadata = await sharp(compressed).metadata()
+    console.log(metadata.size)
+    // Default 400kb
+    // Call compressor
+    // Compressor returns new Buffer
+    // imageCompressor(this.imageData, 4000)
   }
 }
