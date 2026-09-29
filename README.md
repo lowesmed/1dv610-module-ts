@@ -1,11 +1,15 @@
-# 1DV610 module project
+# OptiPic Image Optimizer
 
-A module made for the course **1dv610**at Linneaus University 2026. Built using a pre-configured boilerplate for building robust Node.js console applications with modern tools and best practices.
+Optimize images for web use with OpticPic. Take big, high resolution Images and store them as optimized versions for faster loading, better SEO & smaller footprint. 
 
 ## Overview
 
+The idea is to make it easier for users of your app to upload any sized image and automatically optimize it for web without having to give extensive instructions to your user. This module was made for the course **1DV610** at Linneaus University 2026. Built using a pre-configured boilerplate for building robust Node.js console applications with modern tools and best practices. 
+
 ## 🚀 Features
 
+- **Files & URL:** Handles images stored both locally or via URL.
+- **Limit file size:** Set a maximum size for Images.
 - **TypeScript, strict mode:** Full static typing with `strict` compiler checks enabled from the start.
 - **Modern ECMAScript Modules (ESM):** Full native support for `import`/`export` syntax, resolved via `NodeNext`.
 - **Fast local dev loop:** [tsx](https://github.com/privatenumber/tsx) runs `src/app.ts` directly, no build step needed while iterating.
