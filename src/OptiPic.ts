@@ -115,22 +115,25 @@ export class OptiPic {
   }
 
   /**
-   * ADD.
+   * Initiate compression of image.
    */
   public async compress() {
-    console.log('Compressor here!')
+
     const image = this.imageData
 
     if(image === undefined) {
       throw new Error('No image has been loaded')
     }
-    const compressed = await imageCompressor(image, 200)
-    await writeFile('compressed.jpg', compressed)
-    const metadata = await sharp(compressed).metadata()
-    console.log(metadata.size)
-    // Default 400kb
-    // Call compressor
-    // Compressor returns new Buffer
-    // imageCompressor(this.imageData, 4000)
+
+    this.saveImageToFile(await imageCompressor(image, { width: 1600}))
+  }
+
+  /**
+   * Saves the image as file in root.
+   *
+   * @param image - Image as buffer data
+   */
+  private saveImageToFile(image: Buffer) {
+    writeFile('compressed.jpg', image)
   }
 }
