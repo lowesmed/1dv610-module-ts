@@ -1,2 +1,1 @@
-export { OptiPic } from "./OptiPic.js"
-
+export { OptiPic } from './OptiPic.js'

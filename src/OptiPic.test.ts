@@ -1,5 +1,20 @@
-// import { describe, it, expect } from 'vitest'
-// import { OptiPic} from './index.js'
+import { describe, it, expect } from 'vitest'
+import { OptiPic} from './index.js'
+
+describe('OptiPic', () => {
+  it('Reads metadata from a JPEG URL', async () => {
+    const image = new OptiPic()
+
+    await image.load('https://images.pexels.com/photos/33582812/pexels-photo-33582812.jpeg')
+
+    const metadata = image.getMetadata()
+
+    expect(metadata.format).toBe('jpeg')
+    expect(metadata.width).toBe(2887)
+    expect(metadata.height).toBe(3849)
+    expect(metadata.size).toBeGreaterThan(0)
+  })
+})
 
 // describe('parseArgs()', () => {
 //   it('should return the first positional argument', () => {

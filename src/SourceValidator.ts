@@ -15,6 +15,6 @@ export function validateImageFormat(source: string) {
  * @param source - URL or path to image
  * @returns {boolean} True if url, false if not
  */
-  export function isUrl(source: string): boolean {
-    return source.includes('http')
-  }
+export function isUrl(source: string): boolean {
+  return source.includes('http')
+}

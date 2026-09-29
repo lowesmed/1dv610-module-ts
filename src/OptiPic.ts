@@ -23,7 +23,7 @@ export class OptiPic {
   /**
    * Data from loaded image.
    */
-  private imageData : Buffer | undefined
+  private imageData: Buffer | undefined
 
   /**
    * Metadata from image.
@@ -32,11 +32,11 @@ export class OptiPic {
    * @type {(ImageMetadata | undefined)}
    * @memberof OptiPic
    */
-  private imageMetadata : ImageMetadata | undefined
+  private imageMetadata: ImageMetadata | undefined
   /**
    * Initiziates OptiPic.
    */
-  constructor () {
+  constructor() {
     console.log('OptiPic instance created!')
   }
 
@@ -48,7 +48,7 @@ export class OptiPic {
   public async load(source: string): Promise<void> {
     validateImageFormat(source)
 
-    const data = (isUrl(source)) ? await this.loadFromUrl(source) : await this.loadFromFile(source)
+    const data = isUrl(source) ? await this.loadFromUrl(source) : await this.loadFromFile(source)
 
     const metadata = await this.readMetadata(data)
 
@@ -100,7 +100,14 @@ export class OptiPic {
       format: metadata.format,
       width: metadata.width,
       height: metadata.height,
-      size: metadata.size ?? 0
+      size: metadata.size ?? 0,
     }
+  }
+
+  public getMetadata(): ImageMetadata {
+    if (this.imageMetadata === undefined) {
+      throw new Error('No image has been loaded')
+    }
+    return {...this.imageMetadata}
   }
 }
