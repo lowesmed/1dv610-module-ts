@@ -8,7 +8,7 @@ function main(): void {
 
   try {
     const op = new OptiPic()
-    op.load('./test-app/input/midsommartallrik.jpg')
+    op.load('https://images.pexels.com/photos/33582812/pexels-photo-33582812.jpeg')
   } catch (error) {
     console.error('An unexpected error occurred during execution:', (error as Error).message)
     process.exitCode = 1

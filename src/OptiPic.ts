@@ -54,7 +54,7 @@ export class OptiPic {
 
     this.imageData = data
     this.imageMetadata = metadata
-
+    console.log(this.imageMetadata)
   }
 
   /**
@@ -73,9 +73,18 @@ export class OptiPic {
    * Collect Image data using a URL source.
    *
    * @param url - URL to image
+   * @returns Image buffer data
    */
   private async loadFromUrl(url: string): Promise<Buffer> {
-    console.log("Its a url! " + url)
+    const response = await fetch(url)
+
+    if (!response.ok) {
+      throw new Error(`Could not load image: ${response.status}`)
+    }
+
+    const arrayBuffer = await response.arrayBuffer()
+
+    return Buffer.from(arrayBuffer)
   }
 
   /**

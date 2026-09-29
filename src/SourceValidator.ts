@@ -4,8 +4,8 @@
  * @param source - URL or path to image
  */
 export function validateImageFormat(source: string) {
-  if (!source.toLocaleLowerCase().endsWith('jpg')) {
-    throw Error('The image must be in .jpg format')
+  if (!source.toLocaleLowerCase().endsWith('jpg') && !source.toLocaleLowerCase().endsWith('jpeg')) {
+    throw Error('The image must be in jpg/jpeg format')
   }
 }
 
