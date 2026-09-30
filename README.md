@@ -1,151 +1,174 @@
 # OptiPic Image Optimizer
 
-Optimize images for web use with OpticPic. Take big, high resolution Images and store them as optimized versions for faster loading, better SEO & smaller footprint. 
+Optimize JPEG images for the web. OptiPic takes large, high-resolution images, from a local file or a URL, and saves smaller versions for faster loading, better SEO and a smaller footprint.
 
 ## Overview
 
-The idea is to make it easier for users of your app to upload any sized image and automatically optimize it for web without having to give extensive instructions to your user. This module was made for the course **1DV610** at Linneaus University 2026. Built using a pre-configured boilerplate for building robust Node.js console applications with modern tools and best practices. 
+OptiPic makes it easy for your application to accept images of any size and turn them into web-ready versions without any extra work from your users. You load an image, choose a width and a maximum file size, and OptiPic finds the highest JPEG quality that still fits within your size limit.
 
-## 🚀 Features
+This module was made for the course **1DV610** at Linnaeus University, 2026.
 
-- **Files & URL:** Handles images stored both locally or via URL.
-- **Limit file size:** Set a maximum size for Images.
-- **TypeScript, strict mode:** Full static typing with `strict` compiler checks enabled from the start.
-- **Modern ECMAScript Modules (ESM):** Full native support for `import`/`export` syntax, resolved via `NodeNext`.
-- **Fast local dev loop:** [tsx](https://github.com/privatenumber/tsx) runs `src/app.ts` directly, no build step needed while iterating.
-- **Unit Testing:** Pre-configured with [Vitest](https://vitest.dev) for blazing-fast test execution, including native TypeScript support.
-- **Linting & Code Quality:** Strict code analysis using [ESLint](https://eslint.org) integrated with custom `@lnu/eslint-config` rules, including its TypeScript layer.
-- **Code Formatting:** Automatic code style management via [Prettier](https://prettier.io).
+### What it does
+
+- Loads JPEG images from a **local file path** or a **URL**.
+- Reads image metadata (format, width, height, size).
+- Resizes the image to a given width.
+- Compresses the image to a maximum file size in KB by lowering the JPEG quality step by step.
+- Saves the result to an `output` folder, with a chosen or automatically generated file name.
+
+### What it does not do
+
+- It only supports **JPG/JPEG** input, and output is always JPEG.
+- It does not convert between formats, crop, rotate or edit images.
+- It does not upload images anywhere. Files are only written to the local `output` folder.
 
 ## Table of contents
 
-- [Overview](#overview)
 - [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project structure](#project-structure)
 - [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [External API connection](#external-api-connection)
-  - [Environment variables](#environment-variables)
-  - [Development](#development)
-  - [Production](#production)
-- [Syncing Issues](#syncing-issues)
-- [Task Schema](#task-schema)
-- [Testing](#testing)
-- [Resources](#resources)
+- [Usage](#usage)
+- [API](#api)
+- [Error handling](#error-handling)
+- [Development](#development)
+- [Project structure](#project-structure)
 - [License & Author](#license--author)
 
-## 🛠️ Getting Started
+## Features
+
+- **Files & URLs:** Load images stored locally or online.
+- **Size limit:** Set a maximum file size in KB. OptiPic lowers the quality until the image fits.
+- **Resizing:** Set the output width in pixels.
+- **Sensible defaults:** Width 1200 px and max size 400 KB unless you say otherwise.
+- **Clear errors:** Helpful error messages when something goes wrong.
+- **TypeScript:** Written in strict TypeScript and ESM.
+
+## Getting Started
 
 ### Prerequisites
 
-Ensure you have **Node.js** (version 24.12.0 or later, per `engines` in `package.json`) and **Git** installed on your machine.
+**Node.js** version 24.12.0 or later (see `engines` in `package.json`) and **Git**.
 
-### Installation & Project Setup
+### Installation
 
-Pick the flow that matches your situation.
+```bash
+npm install <package-name-or-github-url>
+```
 
+OptiPic uses [sharp](https://sharp.pixelplumbing.com) for image processing. It is installed automatically as a dependency.
 
-## 💻 Available Scripts
+### Run the test app
 
-You can manage the application lifecycle, testing, and formatting using the following npm scripts:
-
-### Running the Application
-
-Run a test app for the module (`test-app/app.ts`) directly via `tsx` — no separate build step needed.
+The repository includes a test app (`test-app/app.ts`) that uses the module. Put JPEG images in `test-app/input`, then run:
 
 ```bash
 npm start
 ```
 
-The `bin` entry in `package.json` makes the app runnable as a standalone command once built and linked (`npm run build && npm link`) or installed:
+Compressed images are written to `output/`.
 
-```bash
-ts-cli-template "Ada Lovelace"
+## Usage
+
+```typescript
+import { OptiPic } from 'optipic'
+
+const optiPic = new OptiPic()
+
+// Load from a file path or a URL
+await optiPic.load('./photos/holiday.jpg')
+
+// Read metadata about the loaded image
+const { format, width, height, size } = optiPic.getMetadata()
+
+// Compress with the defaults (width 1200 px, max 400 KB)
+await optiPic.compress()
+
+// Or choose your own settings
+await optiPic.compress({ width: 800, maxSizeKB: 150, outputName: 'holiday-small' })
 ```
 
-_Note: Rename the `ts-cli-template` key in `package.json`'s `bin` field (and the `name` field) to match your own project when adapting this template._
+The compressed file is saved as `output/holiday-small.jpg`, in the folder your program runs from.
 
-### Building
+## API
 
-Compiles `src/` to plain JavaScript in `dist/`, which is what the `bin` entry and published package run:
+### `new OptiPic()`
 
-```bash
-npm run build
-```
+Creates a new instance. Each instance holds one loaded image at a time.
 
-`dist/` is git-ignored — it's a build artifact, regenerated on demand (the `prepare` script also runs this automatically after `npm install`, so the `bin` command works right away).
+### `load(source: string): Promise<void>`
 
-### Type Checking
+Loads an image from a file path or a URL. The source must end in `.jpg` or `.jpeg`. Loading a new image replaces the previous one.
 
-Runs the TypeScript compiler in check-only mode (no output files), including test files:
+### `getMetadata(): ImageMetadata`
 
-```bash
-npm run typecheck
-```
+Returns a copy of the loaded image's metadata:
 
-### Running Tests
+| Property | Type     | Description                     |
+| -------- | -------- | ------------------------------- |
+| `format` | `string` | Image format, for example `jpeg` |
+| `width`  | `number` | Width in pixels                 |
+| `height` | `number` | Height in pixels                |
+| `size`   | `number` | File size in bytes              |
 
-- **Interactive Watch Mode (Recommended for development):**
-  ```bash
-  npm test
-  ```
-- **Single Execution Run:**
-  ```bash
-  npm run test:run
-  ```
-- **Run Specific Tests (by matching name patterns):**
-  ```bash
-  npm run test:match -- <test-name-pattern>
-  ```
+### `compress(options?): Promise<void>`
 
-### Code Linting
+Resizes and compresses the loaded image, then saves it to `output/`.
 
-Analyze the source code in `src/` for errors, syntax issues, and anti-patterns:
+| Option       | Type     | Default              | Description                                                                 |
+| ------------ | -------- | -------------------- | --------------------------------------------------------------------------- |
+| `width`      | `number` | `1200`               | Output width in pixels.                                                     |
+| `maxSizeKB`  | `number` | `400`                | Maximum file size in KB.                                                    |
+| `outputName` | `string` | generated            | File name without extension. If omitted, a name like `a1b2c3-w1200` is generated. |
 
-```bash
-npm run lint
-```
+OptiPic starts at JPEG quality 80 and lowers it in steps until the image is small enough, down to a minimum quality of 24.
 
-Automatically fix fixable linting issues:
+## Error handling
 
-```bash
-npm run lint:fix
-```
+`load`, `getMetadata` and `compress` throw an `Error` in these cases:
 
-### Formatting
+| Situation                                        | When                                   |
+| ------------------------------------------------ | -------------------------------------- |
+| `The image must be in jpg/jpeg format`           | `load` with a non-JPEG source          |
+| `Could not load image: <status>`                 | `load` and the URL request failed      |
+| `No image has been loaded`                       | `getMetadata` or `compress` before `load` |
+| `Could not reach target file size...`            | `compress` cannot reach `maxSizeKB`. Increase `maxSizeKB` or use a smaller `width`. |
 
-Check if files comply with Prettier styling rules:
+## Development
 
-```bash
-npm run format:check
-```
+Scripts for working on the module itself:
 
-Automatically reformat all source files:
+| Command              | Description                                   |
+| -------------------- | --------------------------------------------- |
+| `npm start`          | Run the test app with `tsx`                   |
+| `npm run build`      | Compile `src/` to `dist/`                     |
+| `npm run typecheck`  | Type check without emitting files             |
+| `npm test`           | Run unit tests in watch mode ([Vitest](https://vitest.dev)) |
+| `npm run test:run`   | Run unit tests once                           |
+| `npm run lint`       | Lint the source with [ESLint](https://eslint.org) |
+| `npm run lint:fix`   | Fix fixable lint issues                       |
+| `npm run format`     | Format files with [Prettier](https://prettier.io) |
 
-```bash
-npm run format
-```
+Test results are described in [TEST_REPORT.md](./TEST_REPORT.md).
 
-## 📁 Project Structure
-
-Breakdown of important files and folders in the project.
+## Project Structure
 
 ```text
 ├── src/
-│   ├── index.ts            # Module entry point
-│   └── OptiPic.test.ts     # Module unit tests
-├── test-app/               # Test app for the module
-│   └── input               # Images to resize
-├── test/                   # Integration and system tests (higher-level / E2E test flows)
-├── dist/                   # Compiled JavaScript output (git-ignored, generated by `npm run build`)
-├── tsconfig.json           # Base TypeScript config (strict mode; used by the editor, typecheck, and Vitest)
-├── tsconfig.build.json     # Build-only config: extends the base, emits to dist/, excludes test files
-├── package.json            # Project configuration, scripts, and dependencies
-└── LICENSE                 # Unlicense (Public Domain dedication)
+│   ├── index.ts              # Module entry point
+│   ├── OptiPic.ts            # Public class
+│   ├── SourceValidator.ts    # Source format and URL checks
+│   ├── ImageCompressor.ts    # Compression loop
+│   └── OptiPic.test.ts       # Unit tests
+├── test-app/                 # Test app for the module
+│   ├── app.ts
+│   └── input/                # Images to compress
+├── dist/                     # Compiled output (git-ignored, generated by `npm run build`)
+├── tsconfig.json             # TypeScript config (strict mode)
+├── tsconfig.build.json       # Build-only config
+├── package.json              # Scripts and dependencies
+├── TEST_REPORT.md            # Test report
+└── LICENSE                   # Unlicense (public domain)
 ```
 
-## ⚖️ License & Author
+## License & Author
 
 This project was created by Lowe Smed during the course Introduction to software quality (1DV610) as part of the program Web Development Programme at Linneuniversitetet 2026 and is released into the public domain under the [**Unlicense**](https://unlicense.org). You are free to copy, modify, publish, and distribute this boilerplate code in any way you see fit without any restrictions.

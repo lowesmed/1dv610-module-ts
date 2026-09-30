@@ -15,7 +15,6 @@ type CompressorOptions = {
  * @returns Compressed Image in buffer data
  */
 export async function imageCompressor(image: Buffer, { maxSizeKB, width }: CompressorOptions): Promise<Buffer> {
-
   let quality = 80
   const minQuality = 24
   const step = 4
@@ -23,10 +22,9 @@ export async function imageCompressor(image: Buffer, { maxSizeKB, width }: Compr
   while (quality >= minQuality) {
     const output = await sharp(image)
       .resize({ width: width })
-      .jpeg({ quality, mozjpeg: true, chromaSubsampling: '4:4:4'})
+      .jpeg({ quality, mozjpeg: true, chromaSubsampling: '4:4:4' })
       .toBuffer()
 
-    console.log(quality, output.length / 1024)
     if (output.length / 1024 <= maxSizeKB) {
       return output
     }
@@ -35,5 +33,4 @@ export async function imageCompressor(image: Buffer, { maxSizeKB, width }: Compr
   }
 
   throw new Error('Could not reach target file size. Try increase maxSizeKB or use a shorter width')
-
 }

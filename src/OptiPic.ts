@@ -10,16 +10,16 @@ import path from 'node:path'
 import { randomBytes } from 'node:crypto'
 import sharp from 'sharp'
 import { validateImageFormat, isUrl } from './SourceValidator.js'
-import { imageCompressor } from "./ImageCompressor.js"
+import { imageCompressor } from './ImageCompressor.js'
 
-type ImageMetadata = {
+export type ImageMetadata = {
   format: string
   width: number
   height: number
   size: number
 }
 
-type CompressOptions = {
+export type CompressOptions = {
   width?: number
   maxSizeKB?: number
   outputName?: string
@@ -38,13 +38,6 @@ export class OptiPic {
    * Metadata of image.
    */
   private imageMetadata: ImageMetadata | undefined
-
-  /**
-   * Initiziates OptiPic.
-   */
-  constructor() {
-    console.log('OptiPic instance created!')
-  }
 
   /**
    * Loads a valid image from a source (URL or file path)
@@ -69,6 +62,8 @@ export class OptiPic {
    * @returns The file contents as a Buffer
    */
   private async loadFromFile(filePath: string): Promise<Buffer> {
+    // The caller chooses which image to load, so a non-literal path is intended.
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     return await readFile(filePath)
   }
 
@@ -116,27 +111,26 @@ export class OptiPic {
     if (this.imageMetadata === undefined) {
       throw new Error('No image has been loaded')
     }
-    return {...this.imageMetadata}
+    return { ...this.imageMetadata }
   }
 
   /**
-   * Compress the loaded image using default values or choosen options and store it.
+   * Compress the loaded image using default values or choosen options and save it.
    *
    * @param options - Compression and output settings.
    * @param options.width - Output width in pixels (default 1200).
    * @param options.maxSizeKB - Target maximum file size in KB (default 400).
    * @param options.outputName - Optional output file name. If omitted, a name is generated automatically.
    */
-  public async compress({width = 1200, maxSizeKB = 400, outputName}: CompressOptions = {}): Promise<void> {
-
+  public async compress({ width = 1200, maxSizeKB = 400, outputName }: CompressOptions = {}): Promise<void> {
     const image = this.imageData
 
-    if(image === undefined) {
+    if (image === undefined) {
       throw new Error('No image has been loaded')
     }
 
     const fileName = outputName ?? this.makeFileName(width)
-    const compressedImage = await imageCompressor(image, { maxSizeKB, width})
+    const compressedImage = await imageCompressor(image, { maxSizeKB, width })
 
     await this.saveImageToFile(compressedImage, fileName)
   }
@@ -147,10 +141,12 @@ export class OptiPic {
    * @param image - Image as buffer data
    * @param outputName - Name of file
    */
-  private async saveImageToFile(image: Buffer, outputName: string ): Promise<void>{
+  private async saveImageToFile(image: Buffer, outputName: string): Promise<void> {
     const outputDirectory = path.resolve('./output')
-    await mkdir(outputDirectory, {recursive: true})
+    await mkdir(outputDirectory, { recursive: true })
 
+    // The output name is chosen by the caller (or generated), so a non-literal path is intended.
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await writeFile(path.join(outputDirectory, outputName + '.jpg'), image)
   }
 

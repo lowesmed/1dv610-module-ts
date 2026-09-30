@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { OptiPic} from './index.js'
+import { OptiPic } from './index.js'
 
 describe('OptiPic', () => {
   it('Reads metadata from a JPEG URL', async () => {
