@@ -11,7 +11,7 @@ async function main(): Promise<void> {
     const op = new OptiPic()
     await op.load('https://images.pexels.com/photos/33582812/pexels-photo-33582812.jpeg')
     console.log(op.getMetadata())
-    await op.compress()
+    await op.compress({width: 700, outputName: 'hello'})
     console.log(op.getMetadata())
 
   } catch (error) {

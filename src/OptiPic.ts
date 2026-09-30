@@ -5,8 +5,9 @@
  * @version 1.0.0
  */
 
-import { readFile } from 'node:fs/promises'
-import { writeFile } from 'node:fs/promises'
+import { readFile, writeFile, mkdir } from 'node:fs/promises'
+import path from 'node:path'
+import { randomBytes } from 'node:crypto'
 import sharp from 'sharp'
 import { validateImageFormat, isUrl } from './SourceValidator.js'
 import { imageCompressor } from "./ImageCompressor.js"
@@ -16,6 +17,12 @@ type ImageMetadata = {
   width: number
   height: number
   size: number
+}
+
+type CompressOptions = {
+  width?: number
+  maxSizeKB?: number
+  outputName?: string
 }
 
 /**
@@ -40,9 +47,9 @@ export class OptiPic {
   }
 
   /**
-   * Load a valid image from url or file
+   * Loads a valid image from a source (URL or file path)
    *
-   * @param source Path to image
+   * @param source - URL or file path to image
    */
   public async load(source: string): Promise<void> {
     validateImageFormat(source)
@@ -56,15 +63,13 @@ export class OptiPic {
   }
 
   /**
-   * Collect Image data using file path.
+   * Reads the image file from disk and returns its raw bytes.
    *
-   * @param path - Path to image to load
-   * @returns Image buffer data
+   * @param filePath - Path to a image file
+   * @returns The file contents as a Buffer
    */
-  private async loadFromFile(path: string): Promise<Buffer> {
-    const data = await readFile(path)
-
-    return data
+  private async loadFromFile(filePath: string): Promise<Buffer> {
+    return await readFile(filePath)
   }
 
   /**
@@ -89,7 +94,7 @@ export class OptiPic {
    * Read metadata from loaded image using Sharp.
    *
    * @param data Buffer data from image.
-   * @returns Image metadata object
+   * @returns Image metadata object.
    */
   private async readMetadata(data: Buffer): Promise<ImageMetadata> {
     const metadata = await sharp(data).metadata()
@@ -115,9 +120,14 @@ export class OptiPic {
   }
 
   /**
-   * Initiate compression of image.
+   * Compress the loaded image using default values or choosen options and store it.
+   *
+   * @param options - Compression and output settings.
+   * @param options.width - Output width in pixels (default 1200).
+   * @param options.maxSizeKB - Target maximum file size in KB (default 400).
+   * @param options.outputName - Optional output file name. If omitted, a name is generated automatically.
    */
-  public async compress() {
+  public async compress({width = 1200, maxSizeKB = 400, outputName}: CompressOptions = {}): Promise<void> {
 
     const image = this.imageData
 
@@ -125,15 +135,32 @@ export class OptiPic {
       throw new Error('No image has been loaded')
     }
 
-    this.saveImageToFile(await imageCompressor(image, { width: 1600}))
+    const fileName = outputName ?? this.makeFileName(width)
+    const compressedImage = await imageCompressor(image, { maxSizeKB, width})
+
+    await this.saveImageToFile(compressedImage, fileName)
   }
 
   /**
-   * Saves the image as file in root.
+   * Writes image to a folder named output in root
    *
    * @param image - Image as buffer data
+   * @param outputName - Name of file
    */
-  private saveImageToFile(image: Buffer) {
-    writeFile('compressed.jpg', image)
+  private async saveImageToFile(image: Buffer, outputName: string ): Promise<void>{
+    const outputDirectory = path.resolve('./output')
+    await mkdir(outputDirectory, {recursive: true})
+
+    await writeFile(path.join(outputDirectory, outputName + '.jpg'), image)
+  }
+
+  /**
+   * Makes a filename of random hex and width of image.
+   *
+   * @param width - With of image
+   * @returns A random name including width
+   */
+  private makeFileName(width: number): string {
+    return `${randomBytes(3).toString('hex')}-w${width}`
   }
 }

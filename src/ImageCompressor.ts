@@ -1,8 +1,8 @@
 import sharp from 'sharp'
 
 type CompressorOptions = {
-  maxSizeKB?: number
-  width?: number
+  maxSizeKB: number
+  width: number
 }
 
 /**
@@ -10,18 +10,21 @@ type CompressorOptions = {
  *
  * @param image - Image in buffer format
  * @param param1 - Object with options listed below
- * @param param1.maxSizeKB - Maximum file size of compressed image
- * @param param1.width - Set width of compressed image
+ * @param param1.maxSizeKB - Maximum file size of compressed image (Default 400)
+ * @param param1.width - Set width of compressed image (Default 1200)
  * @returns Compressed Image in buffer data
  */
-export async function imageCompressor(image: Buffer, { maxSizeKB = 400, width = 1200}: CompressorOptions = {}): Promise<Buffer> {
+export async function imageCompressor(image: Buffer, { maxSizeKB, width }: CompressorOptions): Promise<Buffer> {
 
   let quality = 80
   const minQuality = 24
   const step = 4
 
   while (quality >= minQuality) {
-    const output = await sharp(image).resize({ width: width }).jpeg({ quality, mozjpeg: true, chromaSubsampling: '4:4:4'}).toBuffer()
+    const output = await sharp(image)
+      .resize({ width: width })
+      .jpeg({ quality, mozjpeg: true, chromaSubsampling: '4:4:4'})
+      .toBuffer()
 
     console.log(quality, output.length / 1024)
     if (output.length / 1024 <= maxSizeKB) {
@@ -31,6 +34,6 @@ export async function imageCompressor(image: Buffer, { maxSizeKB = 400, width = 
     quality -= step
   }
 
-  throw new Error('Could not reach targfile size. Try increase maxSizeKB or minWidth')
+  throw new Error('Could not reach target file size. Try increase maxSizeKB or use a shorter width')
 
 }
