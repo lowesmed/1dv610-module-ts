@@ -1,6 +1,4 @@
 import { OptiPic } from "../src"
-// import { imageCompressor } from "../src/ImageCompressor"
-
 /**
  * Execution entry point.
  */
