@@ -132,7 +132,11 @@ export class OptiPic {
    * @param options.maxSizeKB - Target maximum file size in KB (default 400).
    * @param options.outputName - Optional output file name. If omitted, a name is generated automatically.
    */
-  public async compress({ width = this.defaultWidth, maxSizeKB = this.defaultMaxSizeKB, outputName }: CompressOptions = {}): Promise<void> {
+  public async compress({
+    width = this.defaultWidth,
+    maxSizeKB = this.defaultMaxSizeKB,
+    outputName,
+  }: CompressOptions = {}): Promise<void> {
     const image = this.getLoadedImage()
 
     const fileName = outputName ?? this.makeFileName(width)
@@ -149,10 +153,13 @@ export class OptiPic {
    * @param options.maxSizeKB - Target maximum file size in KB (default 400).
    * @returns Image buffer.
    */
-  public async compressToBuffer({ width = this.defaultWidth, maxSizeKB = this.defaultMaxSizeKB }: CompressOptions = {}): Promise<Buffer> {
+  public async compressToBuffer({
+    width = this.defaultWidth,
+    maxSizeKB = this.defaultMaxSizeKB,
+  }: CompressOptions = {}): Promise<Buffer> {
     const image = this.getLoadedImage()
 
-    return await imageCompressor(image, { maxSizeKB, width})
+    return await imageCompressor(image, { maxSizeKB, width })
   }
 
   /**
