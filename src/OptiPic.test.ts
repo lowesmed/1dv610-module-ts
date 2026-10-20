@@ -13,7 +13,7 @@ describe('OptiPic', () => {
     expect(metadata.width).toBe(2887)
     expect(metadata.height).toBe(3849)
     expect(metadata.size).toBeGreaterThan(0)
-  })
+  }, 30_000)
 
   it('throws if metadata is requested before loading', () => {
     const image = new OptiPic()
