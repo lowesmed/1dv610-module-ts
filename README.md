@@ -79,11 +79,14 @@ await optiPic.load('./photos/holiday.jpg')
 // Read metadata about the loaded image
 const { format, width, height, size } = optiPic.getMetadata()
 
-// Compress with the defaults (width 1200 px, max 400 KB)
+// Compress with the defaults (width 1200 px, max 400 KB) and save to ./output
 await optiPic.compress()
 
-// Or choose your own settings
+// Compress can be used with custom settings for width, size and output name
 await optiPic.compress({ width: 800, maxSizeKB: 150, outputName: 'holiday-small' })
+
+// Get the compressed image as a Buffer instead of saving a file
+const buffer = await optiPic.compressToBuffer({ width: 800, maxSizeKB: 150 })
 ```
 
 The compressed file is saved as `output/holiday-small.jpg`, in the folder your program runs from.
@@ -119,11 +122,20 @@ Resizes and compresses the loaded image, then saves it to `output/`.
 | `maxSizeKB`  | `number` | `400`                | Maximum file size in KB.                                                    |
 | `outputName` | `string` | generated            | File name without extension. If omitted, a name like `a1b2c3-w1200` is generated. |
 
+### `compressToBuffer(options?): Promise<Buffer>`
+
+Resizes and compresses the loaded image and returns it as Buffer data.
+
+| Option       | Type     | Default              | Description                                                                 |
+| ------------ | -------- | -------------------- | --------------------------------------------------------------------------- |
+| `width`      | `number` | `1200`               | Output width in pixels.                                                     |
+| `maxSizeKB`  | `number` | `400`                | Maximum file size in KB.                                                    |
+
 OptiPic starts at JPEG quality 80 and lowers it in steps until the image is small enough, down to a minimum quality of 24.
 
 ## Error handling
 
-`load`, `getMetadata` and `compress` throw an `Error` in these cases:
+`load`, `getMetadata`, `compress` and `compressToBuffer` throws an `Error` in these cases:
 
 | Situation                                        | When                                   |
 | ------------------------------------------------ | -------------------------------------- |

@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { OptiPic } from './index.js'
+import { fileURLToPath } from 'node:url'
+
+const samplePath = fileURLToPath(new URL('../test-app/input/midsommartallrik.jpg', import.meta.url))
 
 describe('OptiPic', () => {
   it('Reads metadata from a JPEG URL', async () => {
@@ -23,5 +26,22 @@ describe('OptiPic', () => {
   it('rejects a source that is not a JPEG', async () => {
     const image = new OptiPic()
     await expect(image.load('picture.png')).rejects.toThrow('The image must be in jpg/jpeg format')
+  })
+
+  it('compressToBuffer() returns a Buffer with image data', async () => {
+    const image = new OptiPic()
+    await image.load(samplePath)
+
+    const buffer = await image.compressToBuffer({ width: 400 })
+
+    expect(buffer).toBeInstanceOf(Buffer)
+    expect(buffer.length).toBeGreaterThan(0)
+  })
+
+  it('throws if no image has been loaded', async () => {
+    const image = new OptiPic()
+
+    await expect(image.compress()).rejects.toThrow('No image has been loaded')
+    await expect(image.compressToBuffer()).rejects.toThrow('No image has been loaded')
   })
 })
