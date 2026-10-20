@@ -40,6 +40,16 @@ export class OptiPic {
   private imageMetadata: ImageMetadata | undefined
 
   /**
+   * Compressed image width if setting is not provided
+   */
+  private readonly defaultWidth = 1200
+
+  /**
+   * Compressed image size if setting is not provided
+   */
+  private readonly defaultMaxSizeKB = 400
+
+  /**
    * Loads a valid image from a source (URL or file path)
    *
    * @param source - URL or file path to image
@@ -115,24 +125,46 @@ export class OptiPic {
   }
 
   /**
-   * Compress the loaded image using default values or choosen options and save it.
+   * Compress the loaded image using default values or chosen settings and save it.
    *
    * @param options - Compression and output settings.
    * @param options.width - Output width in pixels (default 1200).
    * @param options.maxSizeKB - Target maximum file size in KB (default 400).
    * @param options.outputName - Optional output file name. If omitted, a name is generated automatically.
    */
-  public async compress({ width = 1200, maxSizeKB = 400, outputName }: CompressOptions = {}): Promise<void> {
-    const image = this.imageData
-
-    if (image === undefined) {
-      throw new Error('No image has been loaded')
-    }
+  public async compress({ width = this.defaultWidth, maxSizeKB = this.defaultMaxSizeKB, outputName }: CompressOptions = {}): Promise<void> {
+    const image = this.getLoadedImage()
 
     const fileName = outputName ?? this.makeFileName(width)
     const compressedImage = await imageCompressor(image, { maxSizeKB, width })
 
     await this.saveImageToFile(compressedImage, fileName)
+  }
+
+  /**
+   * Compress the loaded image using default values or chosen settings and returns as buffer.
+   *
+   * @param options - Compression and output settings.
+   * @param options.width - Output width in pixels (default 1200).
+   * @param options.maxSizeKB - Target maximum file size in KB (default 400).
+   * @returns Image buffer.
+   */
+  public async compressToBuffer({ width = this.defaultWidth, maxSizeKB = this.defaultMaxSizeKB }: CompressOptions = {}): Promise<Buffer> {
+    const image = this.getLoadedImage()
+
+    return await imageCompressor(image, { maxSizeKB, width})
+  }
+
+  /**
+   * Return image data if not undefined.
+   *
+   * @returns Image buffer data
+   */
+  private getLoadedImage(): Buffer {
+    if (this.imageData === undefined) {
+      throw new Error('No image has been loaded')
+    }
+    return this.imageData
   }
 
   /**
