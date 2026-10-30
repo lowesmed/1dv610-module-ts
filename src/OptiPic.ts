@@ -146,6 +146,13 @@ export class OptiPic {
   }
 
   /**
+   * Add doc.
+   */
+  public async compressVariants() {
+    throw new Error("Not yet implemented");
+  }
+
+  /**
    * Compress the loaded image using default values or chosen settings and returns as buffer.
    *
    * @param options - Compression and output settings.
