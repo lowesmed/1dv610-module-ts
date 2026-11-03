@@ -151,25 +151,55 @@ export class OptiPic {
   }
 
   /**
-   * Create multiple compressed images with different widths.
+   * Create multiple compressed images with different widths. Uses defaults if called empty.
    *
-   * @param variants - Array of compression options
+   * @param variants - Optional array of variants compression options
    */
-  public async compressVariants(variants: CompressOptions[]) {
-    const image = this.getLoadedImage()
-    let counter = 0;
+  public async compressVariants(variants?: CompressOptions[]) {
+    if (variants == undefined) {
+      this.compressVariantsUsingDefaultValues(this.getLoadedImage())
+    } else {
+      this.compressVariantsLoop(variants)
+    }
+  }
 
-    variants.forEach(async (variant) => {
-      const fileName = variant.outputName ?? this.makeFileName(this.defaultVariantsWidths[counter])
+  /**
+   * Each default width gets compressed & stored.
+   *
+   * @param image - Image buffer data.
+   */
+  private compressVariantsUsingDefaultValues(image: Buffer) {
+
+    this.defaultVariantsWidths.forEach(async (defaultWidth) => {
+      const fileName = this.makeFileName(defaultWidth)
       const maxSizeKB = this.defaultMaxSizeKB
-      const width = variant.width || this.defaultVariantsWidths[counter]
+      const width = defaultWidth
 
-      counter ++
-
-      const compressedImage = await imageCompressor(image, { maxSizeKB, width })
+      const compressedImage = await imageCompressor(image, { maxSizeKB, width})
 
       await this.saveImageToFile(compressedImage, fileName)
     })
+  }
+
+  /**
+   * Makes sure each variant gets set name or based on width,
+   *
+   * @param variants - Array of compression variant options.
+   */
+  private compressVariantsLoop(variants: CompressOptions[]) {
+    let counter = 0
+
+    variants.forEach(async (variant) => {
+        const fileName = variant.outputName ?? this.makeFileName(this.defaultVariantsWidths[counter])
+        const maxSizeKB = variant.maxSizeKB || this.defaultMaxSizeKB
+        const width = variant.width || this.defaultVariantsWidths[counter]
+
+        counter ++
+
+        const compressedImage = await imageCompressor(this.getLoadedImage(), { maxSizeKB, width })
+
+        await this.saveImageToFile(compressedImage, fileName)
+      })
   }
 
   /**

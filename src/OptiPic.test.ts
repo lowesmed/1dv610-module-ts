@@ -1,14 +1,19 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { existsSync, readdirSync, rmSync } from 'node:fs'
+import path from 'node:path'
 import { OptiPic } from './index.js'
 import { fileURLToPath } from 'node:url'
 
 const samplePath = fileURLToPath(new URL('../test-app/input/midsommartallrik.jpg', import.meta.url))
+const sampleUrl = 'https://images.pexels.com/photos/33582812/pexels-photo-33582812.jpeg'
+const OUTPUT_DIR = path.join(process.cwd(), 'output')
 
 describe('OptiPic', () => {
   it('Reads metadata from a JPEG URL', async () => {
     const image = new OptiPic()
 
-    await image.load('https://images.pexels.com/photos/33582812/pexels-photo-33582812.jpeg')
+    // Change this in case test fails because of image not being available. Must link to an jpg/jpeg image.
+    await image.load(sampleUrl)
 
     const metadata = image.getMetadata()
 
@@ -43,7 +48,7 @@ describe('OptiPic', () => {
 
     await expect(image.compress()).rejects.toThrow('No image has been loaded')
     await expect(image.compressToBuffer()).rejects.toThrow('No image has been loaded')
-    await expect(image.compressVariants([{width: 600, outputName: 'image-name'}])).rejects.toThrow('No image has been loaded')
+    await expect(image.compressVariants()).rejects.toThrow('No image has been loaded')
   })
 
   it('compressVariants() takes an array of compression options', async () => {
@@ -53,5 +58,33 @@ describe('OptiPic', () => {
     const input = [{width: 600, outputName: 'image-name'}]
 
     await expect(optiPic.compressVariants(input)).resolves.not.toThrow()
+  })
+
+  it('compressVariants() with no arguments uses default widths', async () => {
+    const optiPic = new OptiPic()
+    await optiPic.load(samplePath)
+
+    await expect(optiPic.compressVariants()).resolves.not.toThrow()
+  })
+})
+
+describe('OptiPic.compressVariants()', () => {
+  beforeEach(() => {
+    rmSync(OUTPUT_DIR, { recursive: true, force: true })
+  })
+
+  afterEach(() => {
+    rmSync(OUTPUT_DIR, { recursive: true, force: true })
+  })
+
+  it('Called with no arguments uses default widths', async () => {
+    const optiPic = new OptiPic()
+    await optiPic.load(samplePath)
+    await optiPic.compressVariants()
+
+    expect(existsSync(OUTPUT_DIR)).toBe(true)
+
+    const imageFiles = readdirSync(OUTPUT_DIR)
+    expect(imageFiles).toHaveLength(3)
   })
 })

@@ -14,7 +14,7 @@ This module was made for the course **1DV610** at Linnaeus University, 2026.
 - Reads image metadata (format, width, height, size).
 - Resizes the image to a given width.
 - Compresses the image to a maximum file size in KB by lowering the JPEG quality step by step.
-- Saves the result to an `output` folder, with a chosen or automatically generated file name.
+- Saves the result to an `output` folder, with a chosen or automatically generated file names.
 
 ### What it does not do
 
@@ -159,6 +159,28 @@ Scripts for working on the module itself:
 | `npm run lint:fix`   | Fix fixable lint issues                       |
 | `npm run format`     | Format files with [Prettier](https://prettier.io) |
 
+## Testing
+
+To run the modules automated unit tests you can use fhe following commands:
+
+| Command              | Description                  |
+| -------------------- | ---------------------------- |
+| `npm test`           | Run unit tests in watch mode |
+| `npm run test:run`   | Run unit tests once          |
+
+The following tests are included:
+
+| Test              | Description                                   | Notes |
+| -------------------- | --------------------------------------------- | ------------- |
+| `OptiPic.test.ts`    | Tests of the main module class and its public methods | - Uses a third-party URL as an external dependency. If the tests fails this URL might need to be updated. It's declared in the variable `sampleUrl` |
+
+
+### Test app
+The module also has a test app that creates an instance of the module and call its public methods.
+- Run `npm start` to see a demo of the module in your console.
+- The compressed images will be saved to a folder `output` in the project root.
+
+### Results
 Test results are described in [TEST_REPORT.md](./TEST_REPORT.md).
 
 ## Project Structure
