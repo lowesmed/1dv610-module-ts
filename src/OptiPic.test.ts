@@ -43,5 +43,15 @@ describe('OptiPic', () => {
 
     await expect(image.compress()).rejects.toThrow('No image has been loaded')
     await expect(image.compressToBuffer()).rejects.toThrow('No image has been loaded')
+    await expect(image.compressVariants([{width: 600, outputName: 'image-name'}])).rejects.toThrow('No image has been loaded')
+  })
+
+  it('compressVariants() takes an array of compression options', async () => {
+    const optiPic = new OptiPic()
+    await optiPic.load(samplePath)
+
+    const input = [{width: 600, outputName: 'image-name'}]
+
+    await expect(optiPic.compressVariants(input)).resolves.not.toThrow()
   })
 })

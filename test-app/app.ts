@@ -11,7 +11,11 @@ async function main(): Promise<void> {
 
     await op.load('https://images.pexels.com/photos/33582812/pexels-photo-33582812.jpeg')
     console.log(`Loaded a ${op.getMetadata().height}x${op.getMetadata().width}px ${op.getMetadata().format} image with a size of ${op.getMetadata().size} bytes.`)
-    await op.compressVariants()
+    await op.compressVariants([
+      {maxSizeKB: 90, outputName: 'image-small-2'},
+      {outputName: 'image-medium-2'},
+      {outputName: 'image-large-2'}
+    ])
     // await op.compress({width: 700, outputName: 'hello'})
     // console.log('Compression done!')
 

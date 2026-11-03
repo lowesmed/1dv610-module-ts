@@ -45,9 +45,14 @@ export class OptiPic {
   private readonly defaultWidth = 1200
 
   /**
-   * Compressed image size if setting is not provided
+   * Compressed image max size if setting is not provided
    */
   private readonly defaultMaxSizeKB = 400
+
+  /**
+   * Used for variants widths if non provided
+   */
+  private readonly defaultVariantsWidths = [480, 768, 1280]
 
   /**
    * Loads a valid image from a source (URL or file path)
@@ -146,10 +151,25 @@ export class OptiPic {
   }
 
   /**
-   * Add doc.
+   * Create multiple compressed images with different widths.
+   *
+   * @param variants - Array of compression options
    */
-  public async compressVariants() {
-    throw new Error("Not yet implemented");
+  public async compressVariants(variants: CompressOptions[]) {
+    const image = this.getLoadedImage()
+    let counter = 0;
+
+    variants.forEach(async (variant) => {
+      const fileName = variant.outputName ?? this.makeFileName(this.defaultVariantsWidths[counter])
+      const maxSizeKB = this.defaultMaxSizeKB
+      const width = variant.width || this.defaultVariantsWidths[counter]
+
+      counter ++
+
+      const compressedImage = await imageCompressor(image, { maxSizeKB, width })
+
+      await this.saveImageToFile(compressedImage, fileName)
+    })
   }
 
   /**

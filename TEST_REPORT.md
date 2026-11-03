@@ -11,7 +11,24 @@ Briefly describe how you tested your module, and why you chose that approach —
 that someone else could carry out the same tests.
 -->
 
-Since the project is built on a template using Vitest for testing I decided to use this to perform unit tests on the module's methods. Most of the methods should be covered and a table of each can be seen below.
+### Automatic tests
+This module has been tested mostly automatically using Vitest unit tests. All public methods in the module has minimum of one test associated to it.
+
+**- How:**
+With the module installed locally (see README) run:
+
+`npm run test` - To have 
+
+**- Why:**
+Since the module is made as a part that developers
+
+### Manual testing
+On top of the automatic tests there is a also a test app with a minimal implementation of the module. This 
+
+**- How:** With the module installed locally, run `npm start`. This will trigger a run of the m
+
+**- Why:** Since the module doesn't have any GUI but I also wanted to test the module using a more hands on approach. While developing I find it hard to follow and build the code if I can't see the project in action. I like setting up functions/methods and calling them without any logic to see that parts connect before adding code. 
+
 
 ## Test Results
 
