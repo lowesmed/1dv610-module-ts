@@ -4,10 +4,10 @@ import path from 'node:path'
 import { OptiPic } from './index.js'
 import { fileURLToPath } from 'node:url'
 
-const samplePath = fileURLToPath(new URL('../test-app/input/midsommartallrik.jpg', import.meta.url))
-const sampleUrl = 'https://images.pexels.com/photos/33582812/pexels-photo-33582812.jpeg'
+const SAMPLE_PATH = fileURLToPath(new URL('../test-app/input/midsommartallrik.jpg', import.meta.url))
+const SAMPLE_URL = 'https://images.pexels.com/photos/33582812/pexels-photo-33582812.jpeg'
 const OUTPUT_DIR = path.join(process.cwd(), 'output')
-// Snapshot helper so tests only count and remove files they created themselves
+// Snapshot helper so tests only count and remove files they created themselves.
 const listFiles = () => (existsSync(OUTPUT_DIR) ? readdirSync(OUTPUT_DIR) : [])
 
 describe('OptiPic', () => {
@@ -15,7 +15,7 @@ describe('OptiPic', () => {
     const image = new OptiPic()
 
     // Change this in case test fails because of image not being available. Must link to an jpg/jpeg image.
-    await image.load(sampleUrl)
+    await image.load(SAMPLE_URL)
 
     const metadata = image.getMetadata()
 
@@ -37,7 +37,7 @@ describe('OptiPic', () => {
 
   it('compressToBuffer() returns a Buffer with image data', async () => {
     const image = new OptiPic()
-    await image.load(samplePath)
+    await image.load(SAMPLE_PATH)
 
     const buffer = await image.compressToBuffer({ width: 400 })
 
@@ -57,7 +57,7 @@ describe('OptiPic', () => {
 describe('OptiPic.compressVariants()', () => {
   it('Called with no arguments uses default widths', async () => {
     const optiPic = new OptiPic()
-    await optiPic.load(sampleUrl)
+    await optiPic.load(SAMPLE_URL)
 
     await expectCreatedFiles(
       () => optiPic.compressVariants(),
@@ -67,7 +67,7 @@ describe('OptiPic.compressVariants()', () => {
 })
 
 /**
- * Runs an action, lets the test check the files it created in the output folder, then removes only those files and the folder, if the action created it.
+ * Runs an action, lets the test check the files it created in the output folder and then removes only those files (and the folder if the action created it).
  *
  * @param action - The call under test that writes files to the output folder.
  * @param check - Runs the test's assertions on the new files, before cleanup deletes them.
