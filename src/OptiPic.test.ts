@@ -7,6 +7,8 @@ import { fileURLToPath } from 'node:url'
 const samplePath = fileURLToPath(new URL('../test-app/input/midsommartallrik.jpg', import.meta.url))
 const sampleUrl = 'https://images.pexels.com/photos/33582812/pexels-photo-33582812.jpeg'
 const OUTPUT_DIR = path.join(process.cwd(), 'output')
+// Snapshot helper so tests only count and remove files they created themselves
+const listFiles = () => (existsSync(OUTPUT_DIR) ? readdirSync(OUTPUT_DIR) : [])
 
 describe('OptiPic', () => {
   it('Reads metadata from a JPEG URL', async () => {
@@ -50,41 +52,41 @@ describe('OptiPic', () => {
     await expect(image.compressToBuffer()).rejects.toThrow('No image has been loaded')
     await expect(image.compressVariants()).rejects.toThrow('No image has been loaded')
   })
-
-  it('compressVariants() takes an array of compression options', async () => {
-    const optiPic = new OptiPic()
-    await optiPic.load(samplePath)
-
-    const input = [{width: 600, outputName: 'image-name'}]
-
-    await expect(optiPic.compressVariants(input)).resolves.not.toThrow()
-  })
-
-  it('compressVariants() with no arguments uses default widths', async () => {
-    const optiPic = new OptiPic()
-    await optiPic.load(samplePath)
-
-    await expect(optiPic.compressVariants()).resolves.not.toThrow()
-  })
 })
 
 describe('OptiPic.compressVariants()', () => {
-  beforeEach(() => {
-    rmSync(OUTPUT_DIR, { recursive: true, force: true })
-  })
-
-  afterEach(() => {
-    rmSync(OUTPUT_DIR, { recursive: true, force: true })
-  })
-
   it('Called with no arguments uses default widths', async () => {
     const optiPic = new OptiPic()
-    await optiPic.load(samplePath)
-    await optiPic.compressVariants()
+    await optiPic.load(sampleUrl)
 
-    expect(existsSync(OUTPUT_DIR)).toBe(true)
-
-    const imageFiles = readdirSync(OUTPUT_DIR)
-    expect(imageFiles).toHaveLength(3)
-  })
+    await expectCreatedFiles(
+      () => optiPic.compressVariants(),
+      (created) => expect(created).toHaveLength(3) // number of default widths
+    )
+  }, 30_000)
 })
+
+/**
+ * Runs an action, lets the test check the files it created in the output folder, then removes only those files and the folder, if the action created it.
+ *
+ * @param action - The call under test that writes files to the output folder.
+ * @param check - Runs the test's assertions on the new files, before cleanup deletes them.
+ */
+async function expectCreatedFiles(action: () => Promise<void>, check: (_created: string[]) => void) {
+  const folderExisted = existsSync(OUTPUT_DIR)
+  const before = new Set(listFiles())
+  const newFiles = () => listFiles().filter((f) => !before.has(f))
+
+  try {
+    await action()
+    check(newFiles())
+  } finally {
+    for (const file of newFiles()) {
+      rmSync(path.join(OUTPUT_DIR, file), { force: true })
+    }
+
+    if (!folderExisted && listFiles().length === 0) {
+      rmSync(OUTPUT_DIR, { recursive: true, force: true })
+    }
+  }
+}

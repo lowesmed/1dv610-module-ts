@@ -157,9 +157,9 @@ export class OptiPic {
    */
   public async compressVariants(variants?: CompressOptions[]) {
     if (variants == undefined) {
-      this.compressVariantsUsingDefaultValues(this.getLoadedImage())
+      await this.compressVariantsUsingDefaultValues(this.getLoadedImage())
     } else {
-      this.compressVariantsLoop(variants)
+      await this.compressVariantsLoop(variants)
     }
   }
 
@@ -168,17 +168,18 @@ export class OptiPic {
    *
    * @param image - Image buffer data.
    */
-  private compressVariantsUsingDefaultValues(image: Buffer) {
+  private async compressVariantsUsingDefaultValues(image: Buffer) {
+    await Promise.all(
+      this.defaultVariantsWidths.map(async (defaultWidth) => {
+        const fileName = this.makeFileName(defaultWidth)
+        const maxSizeKB = this.defaultMaxSizeKB
+        const width = defaultWidth
 
-    this.defaultVariantsWidths.forEach(async (defaultWidth) => {
-      const fileName = this.makeFileName(defaultWidth)
-      const maxSizeKB = this.defaultMaxSizeKB
-      const width = defaultWidth
+        const compressedImage = await imageCompressor(image, { maxSizeKB, width })
 
-      const compressedImage = await imageCompressor(image, { maxSizeKB, width})
-
-      await this.saveImageToFile(compressedImage, fileName)
-    })
+        await this.saveImageToFile(compressedImage, fileName)
+      })
+    )
   }
 
   /**
@@ -186,20 +187,22 @@ export class OptiPic {
    *
    * @param variants - Array of compression variant options.
    */
-  private compressVariantsLoop(variants: CompressOptions[]) {
+  private async compressVariantsLoop(variants: CompressOptions[]) {
     let counter = 0
 
-    variants.forEach(async (variant) => {
+    await Promise.all(
+      variants.map(async (variant) => {
         const fileName = variant.outputName ?? this.makeFileName(this.defaultVariantsWidths[counter])
         const maxSizeKB = variant.maxSizeKB || this.defaultMaxSizeKB
         const width = variant.width || this.defaultVariantsWidths[counter]
 
-        counter ++
+        counter++
 
         const compressedImage = await imageCompressor(this.getLoadedImage(), { maxSizeKB, width })
 
         await this.saveImageToFile(compressedImage, fileName)
       })
+    )
   }
 
   /**
