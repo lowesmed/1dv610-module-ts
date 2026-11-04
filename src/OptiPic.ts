@@ -50,7 +50,7 @@ export class OptiPic {
   private readonly defaultMaxSizeKB = 400
 
   /**
-   * Used for variants widths if non provided
+   * Used as default widths for image variables if non provided
    */
   private readonly defaultVariantsWidths = [480, 768, 1280]
 
@@ -127,6 +127,24 @@ export class OptiPic {
       throw new Error('No image has been loaded')
     }
     return { ...this.imageMetadata }
+  }
+
+  /**
+   * Default widths used when creating image variants.
+   *
+   * @returns Widths in pixels.
+   */
+  public getDefaultVariantsWidths() {
+    return this.defaultVariantsWidths
+  }
+
+  /**
+   * The default width of a single compressed image.
+   *
+   * @returns Width in pixels.
+   */
+  public getDefaultWidth() {
+    return this.defaultWidth
   }
 
   /**

@@ -172,7 +172,7 @@ The following tests are included:
 
 | Test              | Description                                   | Notes |
 | -------------------- | --------------------------------------------- | ------------- |
-| `OptiPic.test.ts`    | Tests of the main module class and its public methods | - Uses a third-party URL as an external dependency. If the tests fails this URL might need to be updated. It's declared in the variable `sampleUrl` |
+| `OptiPic.test.ts`    | Tests of the main module class and its public methods | - Uses a third-party URL as an external dependency. If the tests fails this URL might need to be updated. It's declared in the variable `sampleUrl`. Some of the test takes a few seconds to complete, so please be patient. |
 
 
 ### Test app

@@ -55,13 +55,15 @@ describe('OptiPic', () => {
 })
 
 describe('OptiPic.compressVariants()', () => {
-  it('Called with no arguments uses default widths', async () => {
+  it('Passing no arguments stores store files in output folder', async () => {
     const optiPic = new OptiPic()
     await optiPic.load(SAMPLE_URL)
 
+    const numberOfDefaultWidths = optiPic.getDefaultVariantsWidths().length
+
     await expectCreatedFiles(
       () => optiPic.compressVariants(),
-      (created) => expect(created).toHaveLength(3) // number of default widths
+      (created) => expect(created).toHaveLength(numberOfDefaultWidths)
     )
   }, 30_000)
 })
