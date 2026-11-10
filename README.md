@@ -87,9 +87,21 @@ await optiPic.compress({ width: 800, maxSizeKB: 150, outputName: 'holiday-small'
 
 // Get the compressed image as a Buffer instead of saving a file
 const buffer = await optiPic.compressToBuffer({ width: 800, maxSizeKB: 150 })
+
+// Compress variants with three different widths (480, 768, 1280) and save to ./output
+await optiPic.compressVariantsToFiles()
+
+// compressVariantsToFiles can be used with custom settings for widths, sizes and output names. Any left out property will fall back to default
+await optiPic.compressVariantsToFiles([{ width: 200, maxSizeKB: 60, outputName: 'holiday-small' }, { width: 400, maxSizeKB: 120, outputName: 'holiday-medium' }])
+
+// Compress variants with three different widths (480, 768, 1280) and return them as buffers
+await optiPic.compressVariantsToBuffers()
+
+// compressVariantsToBuffers can be used with custom settings for widths and sizes (output name is ignored). Any left out property will fall back to default
+await optiPic.compressVariantsToBuffers([{ width: 200, maxSizeKB: 60 }, { width: 400, maxSizeKB: 120 }])
 ```
 
-The compressed file is saved as `output/holiday-small.jpg`, in the folder your program runs from.
+The compressed files are saved like so: `output/holiday-small.jpg`, in the folder your program runs from.
 
 ## API
 
@@ -133,6 +145,28 @@ Resizes and compresses the loaded image and returns it as Buffer data.
 
 OptiPic starts at JPEG quality 80 and lowers it in steps until the image is small enough, down to a minimum quality of 24.
 
+### `compressVariantsToFiles(variants[]?): Promise<void>`
+
+Resizes and compresses the loaded image into multiple variants with different widths and saves them. Default widths are set to three sizes: `[480, 768, 1280]`.
+
+| Option       | Type     | Default              | Description                                                                 |
+| ------------ | -------- | -------------------- | --------------------------------------------------------------------------- |
+| `width`      | `number` | `[480, 768, 1280]`, variants > 3  `1200`               | Output width in pixels.                                                     |
+| `maxSizeKB`  | `number` | `400`                | Maximum file size in KB.                                                    |
+
+If more than three variants are passed without width defined the default width of 1200 are used for these.
+
+### `compressVariantsToBuffer(variants[]?): Promise<Buffer[]>`
+
+Resizes and compresses the loaded image into multiple variants with different widths returns them in order as a buffers. Default widths are set to three sizes: `[480, 768, 1280]`.
+
+| Option       | Type     | Default              | Description                                                                 |
+| ------------ | -------- | -------------------- | --------------------------------------------------------------------------- |
+| `width`      | `number` | `[480, 768, 1280]`, variants > 3  `1200`               | Output width in pixels.                                                     |
+| `maxSizeKB`  | `number` | `400`                | Maximum file size in KB.                                                    |
+
+If more than three variants are passed without width defined the default width of 1200 are used for these.
+
 ## Error handling
 
 `load`, `getMetadata`, `compress` and `compressToBuffer` throws an `Error` in these cases:
@@ -155,6 +189,7 @@ Scripts for working on the module itself:
 | `npm run typecheck`  | Type check without emitting files             |
 | `npm test`           | Run unit tests in watch mode ([Vitest](https://vitest.dev)) |
 | `npm run test:run`   | Run unit tests once                           |
+| `npm run test:coverage`   | Overview of test coverage    |
 | `npm run lint`       | Lint the source with [ESLint](https://eslint.org) |
 | `npm run lint:fix`   | Fix fixable lint issues                       |
 | `npm run format`     | Format files with [Prettier](https://prettier.io) |
@@ -163,16 +198,16 @@ Scripts for working on the module itself:
 
 To run the modules automated unit tests you can use fhe following commands:
 
-| Command              | Description                  |
-| -------------------- | ---------------------------- |
-| `npm test`           | Run unit tests in watch mode |
-| `npm run test:run`   | Run unit tests once          |
+| Command                   | Description                  |
+| --------------------------| ---------------------------- |
+| `npm test`                | Run unit tests in watch mode |
+| `npm run test:run`        | Run unit tests once          |
 
 The following tests are included:
 
 | Test              | Description                                   | Notes |
 | -------------------- | --------------------------------------------- | ------------- |
-| `OptiPic.test.ts`    | Tests of the main module class and its public methods | - Uses a third-party URL as an external dependency. If the tests fails this URL might need to be updated. It's declared in the variable `sampleUrl`. Some of the test takes a few seconds to complete, so please be patient. |
+| `OptiPic.test.ts`    | Tests of the main module class and its public methods | - Uses a third-party URLs as an external dependencies. If the tests fails these URLs might need to be updated. It's declared in the global variables `SAMPLE_URL` and `SAMPLE_URL_PNG`. Some of the test takes a few seconds to complete, so please be patient. |
 
 
 ### Test app

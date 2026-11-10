@@ -39,6 +39,8 @@ async function main(): Promise<void> {
 
     console.log('Saved!')
 
+    await op.compressVariantsToFiles([{width: 300, outputName: 'hello'}])
+
   } catch (error) {
     console.error('An unexpected error occurred during execution:', (error as Error).message)
     process.exitCode = 1

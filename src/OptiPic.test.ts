@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
-// import { existsSync, readdirSync, rmSync } from 'node:fs'
+import { existsSync, readdirSync, rmSync } from 'node:fs'
 import { rm, stat } from 'node:fs/promises'
 import path from 'node:path'
 import { OptiPic } from './index.js'
@@ -11,9 +11,9 @@ const SAMPLE_PATH = fileURLToPath(new URL('../test-app/input/midsommartallrik.jp
 // Change this in case test fails because of image not being available. Must link to an jpg/jpeg image.
 const SAMPLE_URL = 'https://images.pexels.com/photos/33582812/pexels-photo-33582812.jpeg'
 const SAMPLE_URL_PNG = 'https://en.wikipedia.org/wiki/PNG#/media/File:PNG_transparency_demonstration_1.png'
-// const OUTPUT_DIR = path.join(process.cwd(), 'output')
+const OUTPUT_DIR = path.join(process.cwd(), 'output')
 // Snapshot helper so tests only count and remove files they created themselves.
-// const listFiles = () => (existsSync(OUTPUT_DIR) ? readdirSync(OUTPUT_DIR) : [])
+const listFiles = () => (existsSync(OUTPUT_DIR) ? readdirSync(OUTPUT_DIR) : [])
 
 describe('OptiPic load()', () => {
   it('throws if source is .png format', async () => {

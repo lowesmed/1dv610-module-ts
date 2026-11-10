@@ -189,7 +189,7 @@ export class OptiPic {
   }
 
   /**
-   * Create multiple compressed images with different widths and return them as buffers.
+   * Create multiple compressed images with different widths and return them as buffers. Output name option is ignored.
    *
    * @param variants - Optional array of variant compression options
    * @returns Compressed images as buffers
@@ -233,7 +233,7 @@ export class OptiPic {
   }
 
   /**
-   * Compress the loaded image using default values or chosen settings and returns as buffer.
+   * Compress the loaded image using default values or chosen settings and returns as buffer. Output name option is ignored.
    *
    * @param options - Compression and output settings.
    * @param options.width - Output width in pixels (default 1200).
