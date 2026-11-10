@@ -61,7 +61,7 @@ export class OptiPic {
   private readonly defaultVariantsWidths = [480, 768, 1280]
 
   /**
-   * Loads a valid image from a source (URL or file path)
+   * Loads a valid image from a URL or file path source.
    *
    * @param source - URL or file path to image
    */
