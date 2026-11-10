@@ -141,7 +141,7 @@ export class OptiPic {
    * @returns Widths in pixels.
    */
   public getDefaultVariantsWidths() {
-    return this.defaultVariantsWidths
+    return [...this.defaultVariantsWidths]
   }
 
   /**
