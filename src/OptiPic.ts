@@ -175,7 +175,7 @@ export class OptiPic {
   }
 
   /**
-   * Create multiple compressed images with different widths. Uses defaults if called empty.
+   * Create multiple compressed images with different widths and save them. Uses defaults if called empty.
    *
    * @param variants - Optional array of variants compression options
    */
@@ -186,6 +186,16 @@ export class OptiPic {
     const saves = buffers.map((buffer, index) => this.saveImageToFile(buffer, resolvedVariants[index].outputName))
 
     await Promise.all(saves)
+  }
+
+  /**
+   * Create multiple compressed images with different widths and return them as buffers.
+   *
+   * @param variants - Optional array of variant compression options
+   * @returns Compressed images as buffers
+   */
+  public async compressVariantsToBuffers(variants?: CompressOptions[]): Promise<Buffer[]> {
+    return await this.compressAll(this.resolveVariants(variants))
   }
 
   /**
