@@ -25,6 +25,12 @@ export type CompressOptions = {
   outputName?: string
 }
 
+type ResolvedVariant = {
+  width: number
+  maxSizeKB: number
+  outputName: string
+}
+
 /**
  * Represents a OptiPic instance.
  */
@@ -173,12 +179,47 @@ export class OptiPic {
    *
    * @param variants - Optional array of variants compression options
    */
-  public async compressVariants(variants?: CompressOptions[]) {
-    if (variants == undefined) {
-      await this.compressVariantsUsingDefaultValues(this.getLoadedImage())
-    } else {
-      await this.compressVariantsLoop(variants)
-    }
+  public async compressVariantsToFiles(variants?: CompressOptions[]): Promise<void> {
+    const resolvedVariants = this.resolveVariants(variants)
+    const buffers = await this.compressAll(resolvedVariants)
+
+    const saves = buffers.map((buffer, index) => this.saveImageToFile(buffer, resolvedVariants[index].outputName))
+
+    await Promise.all(saves)
+  }
+
+  /**
+   * Fills in missing options for every variant so the rest of the code never has to check for undefined.
+   *
+   * @param variants - Variant options from the caller, or undefined to use the default widths
+   * @returns One complete variant per requested variant
+   */
+  private resolveVariants(variants?: CompressOptions[]): ResolvedVariant[] {
+    const requestedVariants: CompressOptions[] = variants ?? this.defaultVariantsWidths.map((width) => ({ width }))
+
+    return requestedVariants.map((variant, index) => {
+      const width = variant.width ?? this.defaultVariantsWidths[index] ?? this.defaultWidth
+
+      return {
+        width,
+        maxSizeKB: variant.maxSizeKB ?? this.defaultMaxSizeKB,
+        outputName: variant.outputName ?? this.makeFileName(width),
+      }
+    })
+  }
+
+  /**
+   * Compress the loaded image for every variant.
+   *
+   * @param variants - Complete variants
+   * @returns Compressed buffers in same order as variants
+   */
+  private async compressAll(variants: ResolvedVariant[]): Promise<Buffer[]> {
+    const image = this.getLoadedImage()
+
+    const compressions = variants.map(({ width, maxSizeKB }) => imageCompressor(image, { width, maxSizeKB }))
+
+    return await Promise.all(compressions)
   }
 
   /**
