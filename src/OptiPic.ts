@@ -223,48 +223,6 @@ export class OptiPic {
   }
 
   /**
-   * Each default width gets compressed & stored.
-   *
-   * @param image - Image buffer data.
-   */
-  private async compressVariantsUsingDefaultValues(image: Buffer) {
-    await Promise.all(
-      this.defaultVariantsWidths.map(async (defaultWidth) => {
-        const fileName = this.makeFileName(defaultWidth)
-        const maxSizeKB = this.defaultMaxSizeKB
-        const width = defaultWidth
-
-        const compressedImage = await imageCompressor(image, { maxSizeKB, width })
-
-        await this.saveImageToFile(compressedImage, fileName)
-      })
-    )
-  }
-
-  /**
-   * Makes sure each variant gets set name or based on width,
-   *
-   * @param variants - Array of compression variant options.
-   */
-  private async compressVariantsLoop(variants: CompressOptions[]) {
-    let counter = 0
-
-    await Promise.all(
-      variants.map(async (variant) => {
-        const fileName = variant.outputName ?? this.makeFileName(this.defaultVariantsWidths[counter])
-        const maxSizeKB = variant.maxSizeKB || this.defaultMaxSizeKB
-        const width = variant.width || this.defaultVariantsWidths[counter]
-
-        counter++
-
-        const compressedImage = await imageCompressor(this.getLoadedImage(), { maxSizeKB, width })
-
-        await this.saveImageToFile(compressedImage, fileName)
-      })
-    )
-  }
-
-  /**
    * Compress the loaded image using default values or chosen settings and returns as buffer.
    *
    * @param options - Compression and output settings.
