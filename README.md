@@ -157,7 +157,7 @@ Resizes and compresses the loaded image into multiple variants with different wi
 
 If more than three variants are passed without width defined the default width of 1200 are used for these.
 
-### `compressVariantsToBuffer(variants[]?): Promise<Buffer[]>`
+### `compressVariantsToBuffers(variants[]?): Promise<Buffer[]>`
 
 Resizes and compresses the loaded image into multiple variants with different widths returns them in order as a buffers. Default widths are set to three sizes: `[480, 768, 1280]`.
 

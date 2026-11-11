@@ -18,7 +18,7 @@ async function main(): Promise<void> {
     console.log(`Loaded a ${op.getMetadata().height}x${op.getMetadata().width}px ${op.getMetadata().format} image with a size of ${op.getMetadata().size} bytes.`)
 
     console.log('Compressing to file..')
-    await op.compress()
+    await op.compressToFile()
 
     console.log('Saved!')
 
@@ -28,7 +28,7 @@ async function main(): Promise<void> {
     console.log(`Loaded a ${op.getMetadata().height}x${op.getMetadata().width}px ${op.getMetadata().format} image with a size of ${op.getMetadata().size} bytes.`)
 
     console.log('Compressing to file..')
-    await op.compress()
+    await op.compressToFile()
 
     console.log('Saved!')
 
@@ -38,8 +38,6 @@ async function main(): Promise<void> {
     await op.compressVariantsToFiles()
 
     console.log('Saved!')
-
-    await op.compressVariantsToFiles([{width: 300, outputName: 'hello'}])
 
   } catch (error) {
     console.error('An unexpected error occurred during execution:', (error as Error).message)
