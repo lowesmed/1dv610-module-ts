@@ -157,33 +157,20 @@ export class OptiPic {
   }
 
   /**
-   * Metadata for the currently loaded image.
+   * Compress the loaded image using default values or chosen settings and returns as buffer. Output name option is ignored.
    *
-   * @returns A copy of the loaded image's metadata.
+   * @param options - Compression and output settings.
+   * @param options.width - Output width in pixels (default 1200).
+   * @param options.maxSizeKB - Target maximum file size in KB (default 400).
+   * @returns Image buffer.
    */
-  public getMetadata(): ImageMetadata {
-    if (this.imageMetadata === undefined) {
-      throw new Error('No image has been loaded')
-    }
-    return { ...this.imageMetadata }
-  }
+  public async compressToBuffer({
+    width = this.defaultWidth,
+    maxSizeKB = this.defaultMaxSizeKB,
+  }: CompressOptions = {}): Promise<Buffer> {
+    const image = this.getLoadedImage()
 
-  /**
-   * Default widths used when creating image variants.
-   *
-   * @returns Widths in pixels.
-   */
-  public getDefaultVariantsWidths(): number[] {
-    return [...this.defaultVariantsWidths]
-  }
-
-  /**
-   * The default width of a single compressed image.
-   *
-   * @returns Width in pixels.
-   */
-  public getDefaultWidth() {
-    return this.defaultWidth
+    return await imageCompressor(image, { maxSizeKB, width })
   }
 
   /**
@@ -245,20 +232,33 @@ export class OptiPic {
   }
 
   /**
-   * Compress the loaded image using default values or chosen settings and returns as buffer. Output name option is ignored.
+   * Metadata for the currently loaded image.
    *
-   * @param options - Compression and output settings.
-   * @param options.width - Output width in pixels (default 1200).
-   * @param options.maxSizeKB - Target maximum file size in KB (default 400).
-   * @returns Image buffer.
+   * @returns A copy of the loaded image's metadata.
    */
-  public async compressToBuffer({
-    width = this.defaultWidth,
-    maxSizeKB = this.defaultMaxSizeKB,
-  }: CompressOptions = {}): Promise<Buffer> {
-    const image = this.getLoadedImage()
+  public getMetadata(): ImageMetadata {
+    if (this.imageMetadata === undefined) {
+      throw new Error('No image has been loaded')
+    }
+    return { ...this.imageMetadata }
+  }
 
-    return await imageCompressor(image, { maxSizeKB, width })
+  /**
+   * Default widths used when creating image variants.
+   *
+   * @returns Widths in pixels.
+   */
+  public getDefaultVariantsWidths(): number[] {
+    return [...this.defaultVariantsWidths]
+  }
+
+  /**
+   * The default width of a single compressed image.
+   *
+   * @returns Width in pixels.
+   */
+  public getDefaultWidth() {
+    return this.defaultWidth
   }
 
   /**

@@ -1,19 +1,15 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest'
-// import { existsSync, readdirSync } from 'node:fs'
-import { rm } from 'node:fs/promises'
+/* eslint-disable security/detect-non-literal-fs-filename -- tests read and delete their own output files */
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest'
+import { rm, stat } from 'node:fs/promises'
 import path from 'node:path'
 import { OptiPic } from './index.js'
-// import { fileURLToPath } from 'node:url'
+import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
 
-// const SAMPLE_PATH = fileURLToPath(new URL('../test-app/input/midsommartallrik.jpg', import.meta.url))
-
-// Change this in case test fails because of image not being available. Must link to an jpg/jpeg image.
+// Change these in case test fails because of image not being available.
 const SAMPLE_URL = 'https://images.pexels.com/photos/33582812/pexels-photo-33582812.jpeg'
 const SAMPLE_URL_PNG = 'https://en.wikipedia.org/wiki/PNG#/media/File:PNG_transparency_demonstration_1.png'
-// const OUTPUT_DIR = path.join(process.cwd(), 'output')
-// Snapshot helper so tests only count and remove files they created themselves.
-// const listFiles = () => (existsSync(OUTPUT_DIR) ? readdirSync(OUTPUT_DIR) : [])
+const SAMPLE_PATH = fileURLToPath(new URL('../test-app/input/midsommartallrik.jpg', import.meta.url))
 
 describe('OptiPic load()', () => {
   it('throws if source is .png format', async () => {
@@ -26,6 +22,48 @@ describe('OptiPic load()', () => {
     const optiPic = new OptiPic()
 
     await expect(optiPic.load(SAMPLE_URL_PNG)).rejects.toThrow('The image must be in jpg/jpeg format')
+  })
+
+  it('throws when the URL request fails', async () => {
+    const optiPic = new OptiPic()
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(null, { status: 404 }))
+
+    await expect(optiPic.load('https://missing.com/file.jpg')).rejects.toThrow('Could not load image: 404')
+
+    fetchSpy.mockRestore()
+  })
+})
+
+describe('OptiPic compressToFile()', { timeout: 30000 }, () => {
+  const optiPic = new OptiPic()
+  const outputFile = (name: string): string => path.resolve('./output', name + '.jpg')
+  const testFiles = ['test-to-file', 'test-deprecated']
+
+  beforeAll(async () => {
+    await optiPic.load(SAMPLE_PATH)
+  })
+
+  afterAll(async () => {
+    await Promise.all(testFiles.map((name) => rm(outputFile(name), { force: true })))
+  })
+
+  it('saves the image with the given name and width', async () => {
+    await optiPic.compressToFile({ width: 300, outputName: 'test-to-file' })
+
+    const metadata = await sharp(outputFile('test-to-file')).metadata()
+
+    expect(metadata.width).toBe(300)
+  })
+
+  it('compress() still works, but warns that it is deprecated', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    await optiPic.compress({ width: 300, outputName: 'test-deprecated' })
+
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('deprecated'))
+    expect(await stat(outputFile('test-deprecated'))).toBeDefined()
+
+    warn.mockRestore()
   })
 })
 
@@ -41,6 +79,10 @@ describe('OptiPic compressToBuffer()', { timeout: 30000 }, () => {
 
     expect(buffer).toBeInstanceOf(Buffer)
     expect(buffer.length).toBeGreaterThan(0)
+  })
+
+  it('throws when size limit cannot be reached', async () => {
+    await expect(optiPic.compressToBuffer({ maxSizeKB: 1 })).rejects.toThrow('Could not reach target file size')
   })
 })
 
@@ -96,7 +138,7 @@ describe('OptiPic compressVariantsToBuffers()', { timeout: 30000 }, () => {
 describe('OptiPic compressVariantsToFiles()', { timeout: 30000 }, () => {
   const optiPic = new OptiPic()
   const outputFile = (name: string): string => path.resolve('./output', name + '.jpg')
-  const testFiles = ['test-variants-a', 'test-variants-b', 'test-fail-a', 'test-fail-b']
+  const testFiles = ['test-variants-a', 'test-variants-b']
 
   beforeAll(async () => {
     await optiPic.load(SAMPLE_URL)
@@ -140,40 +182,3 @@ describe('OptiPic getMetaData()', () => {
     })
   })
 })
-
-// it('Passing no arguments stores store files in output folder', async () => {
-//   const optiPic = new OptiPic()
-//   await optiPic.load(SAMPLE_URL)
-
-//   const numberOfDefaultWidths = optiPic.getDefaultVariantsWidths().length
-
-//   await expectCreatedFiles(
-//     () => optiPic.compressVariants(),
-//     (created) => expect(created).toHaveLength(numberOfDefaultWidths)
-//   )
-// })
-
-// /**
-//  * Runs an action, lets the test check the files it created in the output folder and then removes only those files (and the folder if the action created it).
-//  *
-//  * @param action - The call under test that writes files to the output folder.
-//  * @param check - Runs the test's assertions on the new files, before cleanup deletes them.
-//  */
-// async function expectCreatedFiles(action: () => Promise<void>, check: (_created: string[]) => void) {
-//   const folderExisted = existsSync(OUTPUT_DIR)
-//   const before = new Set(listFiles())
-//   const newFiles = () => listFiles().filter((f) => !before.has(f))
-
-//   try {
-//     await action()
-//     check(newFiles())
-//   } finally {
-//     for (const file of newFiles()) {
-//       rmSync(path.join(OUTPUT_DIR, file), { force: true })
-//     }
-
-//     if (!folderExisted && listFiles().length === 0) {
-//       rmSync(OUTPUT_DIR, { recursive: true, force: true })
-//     }
-//   }
-// }
