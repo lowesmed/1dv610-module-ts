@@ -1,6 +1,6 @@
 {
   "name": "optipic",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Optimize JPEG images for the web: resize and compress to a maximum file size",
   "type": "module",
   "main": "dist/index.js",
