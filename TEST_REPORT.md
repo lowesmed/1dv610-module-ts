@@ -38,7 +38,7 @@ Since the module doesn't have any GUI but I also wanted to test the module using
 
 ## Test Results
 
-All tests are automated unit tests (Vitest) in `src/OptiPic.test.ts`, except the two rows marked **Manual** or **Indirect**. Some tests use a JPEG from a URL, and some use the local image `test-app/input/midsommartallrik.jpg`. All tests pass.
+All tests are automated unit tests (Vitest) stored in `src` named like so `fileToTest.test.ts`, except the two rows marked **Manual** or **Indirect**. Some tests use a JPEG from a URL, and some use the local image `test-app/input/midsommartallrik.jpg`. All tests pass.
 
 | What was tested | How it was tested | Result |
 | --------------- | ----------------- | ------ |
@@ -61,16 +61,24 @@ All tests are automated unit tests (Vitest) in `src/OptiPic.test.ts`, except the
 | `load(source)` with a local file path, then `getMetadata()` and `compressToFile()` with the defaults. | **Manual:** ran `npm start`. The app loads `midsommartallrik.jpg` from `test-app/input`, prints the height, width, format and size, and compresses it with the defaults (1200 px, max 400 KB). Checked that the metadata was printed and that a file named like `a1b2c3-w1200.jpg` was created in `output/`. | ✅ Pass |
 | `load(source)` with a URL, then `getMetadata()` and `compressToFile()` with the defaults. | **Manual:** same run. The app loads the Pexels JPEG from a URL, prints the metadata, and compresses it with the defaults. Checked that the printed metadata is for the new image and that a second `-w1200.jpg` file was created in `output/`. | ✅ Pass |
 | `compressVariantsToFiles()` without arguments. | **Manual:** same run. The app creates the default variants of the URL image. Checked that three more files were created in `output/`, ending in `-w480.jpg`, `-w768.jpg` and `-w1280.jpg`, and that they open as images of those widths. | ✅ Pass |
+| `isUrl()` with http and https URLs. | Checked that `http://example.com/cat.jpg` and `https://example.com/cat.jpg` both return `true`. | ✅ Pass |
+| `isUrl()` with other protocols and file paths. | Checked that `ftp://http/images/cat.jpg` and `./cat.jpg` return `false`. The first one is a path that contains `http` and was treated as a URL before the fix. | ✅ Pass |
+| `validateImageFormat()` with JPEG sources. | Checked that `cat.jpg`, `cat.JPEG` and `https://example.com/cat.jpg?w=100` are accepted so letter case and a query string in a URL don't matter. | ✅ Pass |
+| `validateImageFormat()` with other sources. | Checked that `cat.png` and `notajpg` are rejected with `The image must be in jpg/jpeg format`. The second one passed before the fix because the check did not include the dot. | ✅ Pass |
 
 ### Coverage
 
-Run with `npm run test:run -- --coverage`. Result: `OptiPic.ts` <fill in>% statements, `ImageCompressor.ts` <fill in>% statements. Coverage only shows which lines ran. It does not show if the tests check the right things.
+Run with `npm run test:coverage`. Results from 11.11.2026:
+
+![Snapshot test coverage](./docs/test-coverage-nov-26.png)
 
 ### Not covered
+- `ImageCompressor.ts` has no tests of its own. It is only tested indirectly.
 - `compressVariantsToFiles()` without arguments, and the case where one variant fails (nothing should be saved).
 - Two variants with the same `outputName`. The second file overwrites the first.
 - `load(source)` with a local path has no test of its own.
 
 ### Known bugs
 
+**FIXED IN 1.2.1**
 Found during code review but not fixed: `isUrl` treats any path containing `http` as a URL, and `validateImageFormat` accepts names such as `notajpg`.

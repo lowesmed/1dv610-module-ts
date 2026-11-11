@@ -16,12 +16,12 @@ describe('validateImageFormat()', () => {
 
 describe('isUrl()', () => {
   it('returns true for http and https URLs', () => {
-    expect(isUrl('http://example.com/cat.jpg?w=100')).toBe(true)
-    expect(isUrl('https://example.com/cat.jpg?w=100')).toBe(true)
+    expect(isUrl('http://example.com/cat.jpg')).toBe(true)
+    expect(isUrl('https://example.com/cat.jpg')).toBe(true)
   })
 
   it('returns false for other protocols and file paths', () => {
     expect(isUrl('./cat.jpg')).toBe(false)
-    expect(isUrl('ftp://images/cat.jpg')).toBe(false)
+    expect(isUrl('ftp://http/images/cat.jpg')).toBe(false)
   })
 })

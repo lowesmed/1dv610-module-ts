@@ -8,7 +8,7 @@ import sharp from 'sharp'
 
 // Change these in case test fails because of image not being available.
 const SAMPLE_URL = 'https://images.pexels.com/photos/33582812/pexels-photo-33582812.jpeg'
-const SAMPLE_URL_PNG = 'https://en.wikipedia.org/wiki/PNG#/media/File:PNG_transparency_demonstration_1.png'
+const SAMPLE_URL_PNG = 'https://example.com/cat.png'
 const SAMPLE_PATH = fileURLToPath(new URL('../test-app/input/midsommartallrik.jpg', import.meta.url))
 
 describe('OptiPic load()', () => {
