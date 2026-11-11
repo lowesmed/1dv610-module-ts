@@ -1,20 +1,29 @@
 /**
- * Make sure source is a valid image format.
+ * Throws if the source is not a .jpg or .jpeg image. A query string in a URL is ignored.
  *
- * @param source - URL or path to image
+ * @param source - URL or file path to image
  */
-export function validateImageFormat(source: string) {
-  if (!source.toLocaleLowerCase().endsWith('jpg') && !source.toLocaleLowerCase().endsWith('jpeg')) {
-    throw Error('The image must be in jpg/jpeg format')
+export function validateImageFormat(source: string): void {
+  const path = isUrl(source) ? new URL(source).pathname : source
+  const lowerCasePath = path.toLowerCase()
+
+  if (!lowerCasePath.endsWith('.jpg') && !lowerCasePath.endsWith('.jpeg')) {
+    throw new Error('The image must be in jpg/jpeg format')
   }
 }
 
 /**
- * Checks if source is a url.
+ * Checks if source is a path or a http/https URL.
  *
  * @param source - URL or path to image
- * @returns {boolean} True if url, false if not
+ * @returns True if source is URL, false if it's a file path
  */
 export function isUrl(source: string): boolean {
-  return source.includes('http')
+  if (!URL.canParse(source)) {
+    return false
+  }
+
+  const protocol = new URL(source).protocol
+
+  return protocol === 'http:' || protocol === 'https:'
 }
