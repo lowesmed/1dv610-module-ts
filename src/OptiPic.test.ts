@@ -11,6 +11,31 @@ const SAMPLE_URL = 'https://images.pexels.com/photos/33582812/pexels-photo-33582
 const SAMPLE_URL_PNG = 'https://example.com/cat.png'
 const SAMPLE_PATH = fileURLToPath(new URL('../test-app/input/midsommartallrik.jpg', import.meta.url))
 
+describe('OptiPic with options', () => {
+  it('uses the default values that are passed', () => {
+    const optiPic = new OptiPic({width: 400, maxSizeKB: 600, variantsWidths: [200, 300, 400]})
+
+    expect(optiPic.getDefaultWidth()).toBe(400)
+    expect(optiPic.getDefaultMaxSizeKB()).toBe(600)
+    expect(optiPic.getDefaultVariantsWidths()).toEqual([200, 300, 400])
+  })
+
+  it('applies the passed default when compressing', { timeout: 30000 }, async () => {
+    const optiPic = new OptiPic({width: 400})
+    await optiPic.load(SAMPLE_URL)
+
+    const metadata = await sharp(await optiPic.compressToBuffer()).metadata()
+
+    expect(metadata.width).toBe(400)
+  })
+
+  it('rejects defaults that are not valid', () => {
+    expect(() => new OptiPic({width: -5})).toThrow('width must be a positive whole number')
+    expect(() => new OptiPic({maxSizeKB: 0})).toThrow('maxSizeKB must be a positive whole number')
+    expect(() => new OptiPic({variantsWidths: []})).toThrow('variantsWidths must contain at least one width')
+  })
+})
+
 describe('OptiPic load()', () => {
   it('throws if source is .png format', async () => {
     const optiPic = new OptiPic()
