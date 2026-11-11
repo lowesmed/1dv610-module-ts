@@ -80,10 +80,10 @@ await optiPic.load('./photos/holiday.jpg')
 const { format, width, height, size } = optiPic.getMetadata()
 
 // Compress with the defaults (width 1200 px, max 400 KB) and save to ./output
-await optiPic.compress()
+await optiPic.compressToFile()
 
 // Compress can be used with custom settings for width, size and output name
-await optiPic.compress({ width: 800, maxSizeKB: 150, outputName: 'holiday-small' })
+await optiPic.compressToFile({ width: 800, maxSizeKB: 150, outputName: 'holiday-small' })
 
 // Get the compressed image as a Buffer instead of saving a file
 const buffer = await optiPic.compressToBuffer({ width: 800, maxSizeKB: 150 })
@@ -124,7 +124,7 @@ Returns a copy of the loaded image's metadata:
 | `height` | `number` | Height in pixels                |
 | `size`   | `number` | File size in bytes              |
 
-### `compress(options?): Promise<void>`
+### `compressToFile(options?): Promise<void>`
 
 Resizes and compresses the loaded image, then saves it to `output/`.
 
@@ -133,6 +133,7 @@ Resizes and compresses the loaded image, then saves it to `output/`.
 | `width`      | `number` | `1200`               | Output width in pixels.                                                     |
 | `maxSizeKB`  | `number` | `400`                | Maximum file size in KB.                                                    |
 | `outputName` | `string` | generated            | File name without extension. If omitted, a name like `a1b2c3-w1200` is generated. |
+
 
 ### `compressToBuffer(options?): Promise<Buffer>`
 
@@ -166,6 +167,10 @@ Resizes and compresses the loaded image into multiple variants with different wi
 | `maxSizeKB`  | `number` | `400`                | Maximum file size in KB.                                                    |
 
 If more than three variants are passed without width defined the default width of 1200 are used for these.
+
+### *DEPRECATED* `compress()`
+
+This method will be removed in next major version. Please use `compressToFile()` instead.
 
 ## Error handling
 

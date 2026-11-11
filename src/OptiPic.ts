@@ -124,6 +124,39 @@ export class OptiPic {
   }
 
   /**
+   * Compress the loaded image using default values or chosen settings and save it.
+   *
+   * @param options - Compression and output settings.
+   * @param options.width - Output width in pixels (default 1200).
+   * @param options.maxSizeKB - Target maximum file size in KB (default 400).
+   * @param options.outputName - Optional output file name. If omitted, a name is generated automatically.
+   */
+  public async compressToFile({
+    width = this.defaultWidth,
+    maxSizeKB = this.defaultMaxSizeKB,
+    outputName,
+  }: CompressOptions = {}): Promise<void> {
+    const image = this.getLoadedImage()
+
+    const fileName = outputName ?? this.makeFileName(width)
+    const compressedImage = await imageCompressor(image, { maxSizeKB, width })
+
+    await this.saveImageToFile(compressedImage, fileName)
+  }
+
+  /**
+   * Makes sure updating module doesn't break compatibility by calling new method.
+   *
+   * @deprecated Use compressToFile() instead. compress() will be removed in the next major version.
+   * @param options - Same options as compressToFile()
+   */
+  public async compress(options: CompressOptions = {}): Promise<void> {
+    console.warn('OptiPic.compress() is deprecated. Use compressToFile() instead.')
+
+    await this.compressToFile(options)
+  }
+
+  /**
    * Metadata for the currently loaded image.
    *
    * @returns A copy of the loaded image's metadata.
@@ -140,7 +173,7 @@ export class OptiPic {
    *
    * @returns Widths in pixels.
    */
-  public getDefaultVariantsWidths() {
+  public getDefaultVariantsWidths(): number[] {
     return [...this.defaultVariantsWidths]
   }
 
@@ -151,27 +184,6 @@ export class OptiPic {
    */
   public getDefaultWidth() {
     return this.defaultWidth
-  }
-
-  /**
-   * Compress the loaded image using default values or chosen settings and save it.
-   *
-   * @param options - Compression and output settings.
-   * @param options.width - Output width in pixels (default 1200).
-   * @param options.maxSizeKB - Target maximum file size in KB (default 400).
-   * @param options.outputName - Optional output file name. If omitted, a name is generated automatically.
-   */
-  public async compress({
-    width = this.defaultWidth,
-    maxSizeKB = this.defaultMaxSizeKB,
-    outputName,
-  }: CompressOptions = {}): Promise<void> {
-    const image = this.getLoadedImage()
-
-    const fileName = outputName ?? this.makeFileName(width)
-    const compressedImage = await imageCompressor(image, { maxSizeKB, width })
-
-    await this.saveImageToFile(compressedImage, fileName)
   }
 
   /**
