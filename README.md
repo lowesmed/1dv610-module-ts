@@ -71,7 +71,11 @@ Compressed images are written to `output/`.
 ```typescript
 import { OptiPic } from 'optipic'
 
+// Create instance
 const optiPic = new OptiPic()
+
+// OptiPic can also be instantiated using options to use custom default width, max size and variants widths 
+const optiPic = new OptiPic({ width: 800, maxSizeKB = 600, [200, 400, 600] })
 
 // Load from a file path or a URL
 await optiPic.load('./photos/holiday.jpg')

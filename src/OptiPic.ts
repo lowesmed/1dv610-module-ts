@@ -11,6 +11,13 @@ import { randomBytes } from 'node:crypto'
 import sharp from 'sharp'
 import { validateImageFormat, isUrl } from './SourceValidator.js'
 import { imageCompressor } from './ImageCompressor.js'
+import { validatePositiveInteger } from './OptionsValidator.js'
+
+export type OptiPicDefaults = {
+  width?: number
+  maxSizeKB?: number
+  variantsWidths?: number[]
+}
 
 export type ImageMetadata = {
   format: string
@@ -48,17 +55,32 @@ export class OptiPic {
   /**
    * Compressed image width if setting is not provided
    */
-  private readonly defaultWidth = 1200
+  private readonly defaultWidth: number
 
   /**
    * Compressed image max size if setting is not provided
    */
-  private readonly defaultMaxSizeKB = 400
+  private readonly defaultMaxSizeKB: number
 
   /**
    * Used as default widths for image variables if non provided
    */
-  private readonly defaultVariantsWidths = [480, 768, 1280]
+  private readonly defaultVariantsWidths: number[]
+
+  constructor({ width = 1200, maxSizeKB = 400, variantsWidths = [480, 768, 1280] }: OptiPicDefaults = {}) {
+    validatePositiveInteger(width, 'width')
+    validatePositiveInteger(maxSizeKB, 'maxSizeKB')
+
+    if (variantsWidths.length === 0) {
+      throw new Error('variantsWidths must contain at least one width')
+    }
+
+    variantsWidths.forEach((variant) => validatePositiveInteger(variant, 'variantsWidths'))
+
+    this.defaultWidth = width
+    this.defaultMaxSizeKB = maxSizeKB
+    this.defaultVariantsWidths = [...variantsWidths]
+  }
 
   /**
    * Loads a valid image from a URL or file path source.
@@ -257,8 +279,17 @@ export class OptiPic {
    *
    * @returns Width in pixels.
    */
-  public getDefaultWidth() {
+  public getDefaultWidth(): number {
     return this.defaultWidth
+  }
+
+  /**
+   * The default max size of a single compressed image.
+   *
+   * @returns Size in KB.
+   */
+  public getDefaultMaxSizeKB(): number {
+    return this.defaultMaxSizeKB
   }
 
   /**
