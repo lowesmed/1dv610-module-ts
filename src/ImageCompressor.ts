@@ -5,32 +5,51 @@ type CompressorOptions = {
   width: number
 }
 
+const START_QUALITY = 80
+const MIN_QUALITY = 24
+const QUALITY_STEP = 4
+const BYTES_PER_KB = 1024
+
 /**
- * Compress image with to a maximum size in KB and a set width.
+ * Compress image to a set width and a maximum size in KB by lowering the JPEG quality step by step.
  *
  * @param image - Image in buffer format
- * @param param1 - Object with options listed below
- * @param param1.maxSizeKB - Maximum file size of compressed image (Default 400)
- * @param param1.width - Set width of compressed image (Default 1200)
- * @returns Compressed Image in buffer data
+ * @param options - Compression settings
+ * @param options.maxSizeKB - Maximum file size of the compressed image in KB
+ * @param options.width - Width of the compressed image in pixels
+ * @returns Compressed image in buffer format
  */
 export async function imageCompressor(image: Buffer, { maxSizeKB, width }: CompressorOptions): Promise<Buffer> {
-  let quality = 80
-  const minQuality = 24
-  const step = 4
+  for (let quality = START_QUALITY; quality >= MIN_QUALITY; quality -= QUALITY_STEP) {
+    const output = await encodeAsJpeg(image, width, quality)
 
-  while (quality >= minQuality) {
-    const output = await sharp(image)
-      .resize({ width: width })
-      .jpeg({ quality, mozjpeg: true, chromaSubsampling: '4:4:4' })
-      .toBuffer()
-
-    if (output.length / 1024 <= maxSizeKB) {
+    if (isWithinSizeLimit(output, maxSizeKB)) {
       return output
     }
-
-    quality -= step
   }
 
-  throw new Error('Could not reach target file size. Try increase maxSizeKB or use a shorter width')
+  throw new Error('Could not reach target file size. Try increasing maxSizeKB or using a smaller width')
+}
+
+/**
+ * Resizes the image and encodes it as JPEG.
+ *
+ * @param image - Image in buffer format
+ * @param width - Width in pixels
+ * @param quality - JPEG quality
+ * @returns Encoded image in buffer format
+ */
+function encodeAsJpeg(image: Buffer, width: number, quality: number): Promise<Buffer> {
+  return sharp(image).resize({ width }).jpeg({ quality, mozjpeg: true, chromaSubsampling: '4:4:4' }).toBuffer()
+}
+
+/**
+ * Checks if an image is small enough.
+ *
+ * @param image - Image in buffer format
+ * @param maxSizeKB - Maximum file size in KB
+ * @returns True if the image is within the limit
+ */
+function isWithinSizeLimit(image: Buffer, maxSizeKB: number): boolean {
+  return image.length / BYTES_PER_KB <= maxSizeKB
 }
