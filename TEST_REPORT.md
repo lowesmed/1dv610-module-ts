@@ -22,6 +22,7 @@ This module has been tested mostly automatically using Vitest unit tests. All pu
 With the module installed locally run:
 
 `npm run test:run` - This will trigger one run of all the tests associated with the module.
+`npm run test:run testName` - To run only the test for a specific file.
 
 **Why:**<br>
 Since the module is used primarily by developers I wanted to do testing that others are familiar with. I also want to learn more about Vitest and I like using the coverage functions to make sure most of the code gets tested.
@@ -79,10 +80,12 @@ Run with `npm run test:coverage`. Results from 11.11.2026:
 ![Snapshot test coverage](./docs/test-coverage-11-nov-26.png)
 
 ### Not covered
-- `ImageCompressor.ts` has no tests of its own. It is only tested indirectly.
+- `ImageCompressor.ts` has no tests of its own. It is only tested indirectly, through the compress methods.
+- `load(source)` with a local path has no direct test. It is only used in the setup of the `compressToFile()` tests.
+- `compressToFile()` and `compressToBuffer()` before `load()`.
 - `compressVariantsToFiles()` without arguments, and the case where one variant fails (nothing should be saved).
+- A generated file name when `outputName` is not given.
 - Two variants with the same `outputName`. The second file overwrites the first.
-- `load(source)` with a local path has no test of its own.
 
 ### Known bugs
 
