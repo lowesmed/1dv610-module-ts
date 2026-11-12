@@ -210,6 +210,7 @@ export class OptiPic {
    */
   public async compressVariantsToFiles(variants?: CompressOptions[]): Promise<void> {
     const resolvedVariants = this.resolveVariants(variants)
+    this.validateUniqueNames(resolvedVariants)
     const buffers = await this.compressAll(resolvedVariants)
 
     const saves = buffers.map((buffer, index) => this.saveImageToFile(buffer, resolvedVariants[index].outputName))
@@ -245,6 +246,19 @@ export class OptiPic {
         outputName: variant.outputName ?? this.makeFileName(width),
       }
     })
+  }
+
+  /**
+   * Prevent overwrite by making sure no two variants are saved with the same file name.
+   *
+   * @param variants - Complete variants
+   */
+  private validateUniqueNames(variants: ResolvedVariant[]): void {
+    const names = variants.map((variant) => variant.outputName)
+
+    if (new Set(names).size !== names.length) {
+      throw new Error('Each variant needs a unique outputName')
+    }
   }
 
   /**

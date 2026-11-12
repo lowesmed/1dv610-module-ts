@@ -185,6 +185,12 @@ describe('OptiPic compressVariantsToFiles()', { timeout: 30000 }, () => {
     expect(small.width).toBe(600)
     expect(large.width).toBe(1200)
   })
+
+  it('rejects variants that share the same outputName', async () => {
+    await expect(optiPic.compressVariantsToFiles([{ outputName: 'same' }, { outputName: 'same' }])).rejects.toThrow(
+      'Each variant needs a unique outputName'
+    )
+  })
 })
 
 describe('OptiPic getMetaData()', () => {

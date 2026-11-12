@@ -85,8 +85,7 @@ Run with `npm run test:coverage`. Results from 11.11.2026:
 - `load(source)` with a local path has no direct test. It is only used in the setup of the `compressToFile()` tests.
 - `compressToFile()` and `compressToBuffer()` before `load()`.
 - `compressVariantsToFiles()` without arguments, and the case where one variant fails (nothing should be saved).
-- A generated file name when `outputName` is not given.
-- Two variants with the same `outputName`. The second file overwrites the first.
+- File names being generated when `outputName` is not given.
 
 ### Known bugs
 
