@@ -76,7 +76,7 @@ All tests are automated unit tests (Vitest) stored in `src` named like so `fileT
 
 Run with `npm run test:coverage`. Results from 11.11.2026:
 
-![Snapshot test coverage](./docs/test-coverage-nov-26.png)
+![Snapshot test coverage](./docs/test-coverage-11-nov-26.png)
 
 ### Not covered
 - `ImageCompressor.ts` has no tests of its own. It is only tested indirectly.
