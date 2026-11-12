@@ -13,7 +13,7 @@ const SAMPLE_PATH = fileURLToPath(new URL('../test-app/input/midsommartallrik.jp
 
 describe('OptiPic with options', () => {
   it('uses the default values that are passed', () => {
-    const optiPic = new OptiPic({width: 400, maxSizeKB: 600, variantsWidths: [200, 300, 400]})
+    const optiPic = new OptiPic({ width: 400, maxSizeKB: 600, variantsWidths: [200, 300, 400] })
 
     expect(optiPic.getDefaultWidth()).toBe(400)
     expect(optiPic.getDefaultMaxSizeKB()).toBe(600)
@@ -21,7 +21,7 @@ describe('OptiPic with options', () => {
   })
 
   it('applies the passed default when compressing', { timeout: 30000 }, async () => {
-    const optiPic = new OptiPic({width: 400})
+    const optiPic = new OptiPic({ width: 400 })
     await optiPic.load(SAMPLE_URL)
 
     const metadata = await sharp(await optiPic.compressToBuffer()).metadata()
@@ -30,9 +30,9 @@ describe('OptiPic with options', () => {
   })
 
   it('rejects defaults that are not valid', () => {
-    expect(() => new OptiPic({width: -5})).toThrow('width must be a positive whole number')
-    expect(() => new OptiPic({maxSizeKB: 0})).toThrow('maxSizeKB must be a positive whole number')
-    expect(() => new OptiPic({variantsWidths: []})).toThrow('variantsWidths must contain at least one width')
+    expect(() => new OptiPic({ width: -5 })).toThrow('width must be a positive whole number')
+    expect(() => new OptiPic({ maxSizeKB: 0 })).toThrow('maxSizeKB must be a positive whole number')
+    expect(() => new OptiPic({ variantsWidths: [] })).toThrow('variantsWidths must contain at least one width')
   })
 })
 

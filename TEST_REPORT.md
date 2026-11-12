@@ -65,6 +65,12 @@ All tests are automated unit tests (Vitest) stored in `src` named like so `fileT
 | `isUrl()` with other protocols and file paths. | Checked that `ftp://http/images/cat.jpg` and `./cat.jpg` return `false`. The first one is a path that contains `http` and was treated as a URL before the fix. | ✅ Pass |
 | `validateImageFormat()` with JPEG sources. | Checked that `cat.jpg`, `cat.JPEG` and `https://example.com/cat.jpg?w=100` are accepted so letter case and a query string in a URL don't matter. | ✅ Pass |
 | `validateImageFormat()` with other sources. | Checked that `cat.png` and `notajpg` are rejected with `The image must be in jpg/jpeg format`. The second one passed before the fix because the check did not include the dot. | ✅ Pass |
+| `new OptiPic(defaults)` with width, `maxSizeKB` and variant widths. | Created an instance with `width: 400`, `maxSizeKB: 600` and `variantsWidths: [200, 300, 400]` and checked that the three getters return exactly those values. | ✅ Pass |
+| `new OptiPic({ width })` is used when compressing. | Created an instance with `width: 400`, loaded a JPEG from a URL, called `compressToBuffer()` without options, read the buffer with `sharp` and checked that the width is 400. | ✅ Pass |
+| `new OptiPic(defaults)` with invalid values. | Checked that a negative `width`, a `maxSizeKB` of 0 and an empty `variantsWidths` list all throw an error with a message that names the setting. | ✅ Pass |
+| `validatePositiveInteger()` with valid numbers. | Checked that `1` and `1200` are accepted without an error. | ✅ Pass |
+| `validatePositiveInteger()` with invalid numbers. | Checked that `0`, `-1`, `1.5` and `NaN` are all rejected with `width must be a positive whole number`. | ✅ Pass |
+| `validatePositiveInteger()` error message. | Passed the name `maxSizeKB` with `-1` and checked that the name is used in the message: `maxSizeKB must be a positive whole number`. | ✅ Pass |
 
 ### Coverage
 
