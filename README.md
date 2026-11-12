@@ -210,7 +210,8 @@ To run the modules automated unit tests you can use fhe following commands:
 | Command                   | Description                  |
 | --------------------------| ---------------------------- |
 | `npm test`                | Run unit tests in watch mode |
-| `npm run test:run`        | Run unit tests once          |
+| `npm run test:run`        | Run all unit tests once          |
+| `npm run test:run testName`        | Run specific unit tests once          |
 
 The following tests are included:
 
@@ -218,12 +219,13 @@ The following tests are included:
 | -------------------- | --------------------------------------------- | ------------- |
 | `OptiPic.test.ts`    | Tests of the main module class and its public methods | - Uses a third-party URL as an external dependency. If the test fails this URL might need to be updated. It's declared in the global variables `SAMPLE_URL`. Some of the test takes a few seconds to complete, so please be patient. |
 | `SourceValidator.test.ts` | Tests of exported functions | None |
+| `OptionsValidator.test.ts` | Tests of exported functions | None |
 
 
 ### Test app
 The module also has a test app that creates an instance of the module and call its public methods.
 - Run `npm start` to see a demo of the module in your console.
-- The compressed images will be saved to a folder `output` in the project root.
+- The compressed images will be saved to a folder `output` in the project root (these need to be manually deleted after).
 
 ### Results
 Test results are described in [TEST_REPORT.md](./TEST_REPORT.md).
@@ -237,6 +239,7 @@ Test results are described in [TEST_REPORT.md](./TEST_REPORT.md).
 │   ├── SourceValidator.ts      # Source format and URL checks
 │   ├── ImageCompressor.ts      # Compression loop
 │   ├── ImageValidator.test.ts  # Unit tests
+│   ├── OptionsValidator.test.ts  # Unit tests
 │   └── OptiPic.test.ts         # Unit tests
 ├── test-app/                   # Test app for the module
 │   ├── app.ts
