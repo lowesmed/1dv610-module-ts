@@ -34,8 +34,9 @@ In addition to the automatic tests there is a also a test app (`test-app/app.ts`
 With the module installed locally, run `npm start`. This will trigger a run of a test app that calls some methods of the module and display some output in the console. It will compress and store files inside a folder in the project root. Make sure you delete these files after the test is done.
 
 **Why:**<br>
-Since the module doesn't have any GUI but I also wanted to test the module using a more hands on approach. While developing I find it hard to follow and build the code if I can't see the project in action. I like setting up functions/methods and calling them without any logic to see that parts connect before adding code. 
+Since the module doesn't have any GUI but I also wanted to test the module using a more hands on approach. While developing I find it hard to follow and build the code if I can't see the project in action. I like setting up functions/methods and calling them without any logic to see that parts connect before adding code.
 
+**- Limitation:** The test app only runs the normal flow with default settings. It doesn't use custom options, the buffer methods, the constructor defaults or the error cases. Those are tested by the automated unit tests instead so the test app is a complement and not the main way of testing.
 
 ## Test Results
 
