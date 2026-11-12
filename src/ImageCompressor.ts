@@ -32,7 +32,7 @@ export async function imageCompressor(image: Buffer, { maxSizeKB, width }: Compr
 }
 
 /**
- * Resizes the image and encodes it as JPEG.
+ * Uses sharp to resize the image and encode it as JPEG.
  *
  * @param image - Image in buffer format
  * @param width - Width in pixels
