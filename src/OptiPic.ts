@@ -67,6 +67,14 @@ export class OptiPic {
    */
   private readonly defaultVariantsWidths: number[]
 
+  /**
+   * Creates an OptiPic instance. All settings are optional and replaces the built-in defaults.
+   *
+   * @param defaults - Default settings used when a method is called without them
+   * @param defaults.width - Default output width in pixels (default 1200)
+   * @param defaults.maxSizeKB - Default maximum file size in KB (default 400)
+   * @param defaults.variantsWidths - Default widths for variants (default 480, 768 and 1280)
+   */
   constructor({ width = 1200, maxSizeKB = 400, variantsWidths = [480, 768, 1280] }: OptiPicDefaults = {}) {
     validatePositiveInteger(width, 'width')
     validatePositiveInteger(maxSizeKB, 'maxSizeKB')
